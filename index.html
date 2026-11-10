@@ -1,14 +1,218 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-season="autumn" data-phase="day" data-mode="auto">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MonTop · mountain guide to Montenegro</title>
-<meta name="description" content="MonTop: independent mountain guide to Montenegro. Durmitor first.">
-<link rel="canonical" href="https://durmitornationalpark.me/">
-<meta http-equiv="refresh" content="0; url=https://durmitornationalpark.me/">
-<script>location.replace("https://durmitornationalpark.me/" + location.search + location.hash)</script>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1d15;color:#e8efea;font:16px/1.5 system-ui,sans-serif}a{color:#74c99c}</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MonTop: Montenegro’s national parks · trails, drives, stays</title>
+<meta name="description" content="Independent guide to Montenegro’s five national parks: Durmitor, Lovćen, Lake Skadar, Biogradska Gora and Prokletije. Trails with GPX, drives with Google Maps points, seasons, prices.">
+<meta property="og:title" content="MonTop · Montenegro’s national parks">
+<meta property="og:description" content="Durmitor, Lovćen, Lake Skadar, Biogradska Gora and Prokletije: trails, drives and stays, season by season.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://montop.me/">
+<meta property="og:url" content="https://montop.me/">
+<meta property="og:image" content="https://montop.me/assets/hub/durmitor-summer.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<!--HEAD-->
+<meta name="theme-color" content="#0b1d15">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1d15'/%3E%3Cpath d='M8 50 26 22l9 13 6-8 15 23z' fill='%2374c99c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;500;600&family=Onest:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/montop.css?v=202611101006">
+<style>
+body { background: var(--pine-950); }
+.stage { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #8fb0c8; }
+.stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; opacity: 0; transition: opacity .9s ease, filter 1.2s; transform: scale(1.04); }
+.stage img.on { opacity: 1; transform: none; transition: opacity .9s ease, transform 8s ease-out, filter 1.2s; }
+.stage .night { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s;
+  background: radial-gradient(1px 1px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 32% 9%, #fff, transparent), radial-gradient(1.5px 1.5px at 58% 22%, #fff, transparent),
+              radial-gradient(1px 1px at 71% 7%, #fff, transparent), radial-gradient(1px 1px at 86% 26%, #fff, transparent), radial-gradient(1px 1px at 44% 31%, #fff, transparent),
+              radial-gradient(1px 1px at 22% 36%, #fff, transparent), radial-gradient(1.5px 1.5px at 92% 12%, #fff, transparent),
+              linear-gradient(180deg, rgba(22, 36, 72, .82) 0%, rgba(40, 60, 104, .45) 45%, rgba(20, 30, 50, .2) 100%); }
+.stage .moon { position: absolute; left: 78%; top: 14%; width: 8vmin; height: 8vmin; border-radius: 50%; opacity: 0; transition: opacity 1.2s;
+  background: radial-gradient(circle at 40% 40%, #fffbea, #e9e2c8 60%, #d6cfb2); box-shadow: 0 0 40px 12px rgba(255, 246, 214, .25); }
+html[data-phase="night"] .stage .night, html[data-phase="night"] .stage .moon { opacity: 1; }
+html[data-phase="night"] .stage img { filter: brightness(.74) saturate(.7) hue-rotate(6deg); }
+html[data-phase="dusk"] .stage img, html[data-phase="dawn"] .stage img { filter: brightness(.86) sepia(.25) saturate(1.1); }
+.stage .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 17, 12, 0) 45%, rgba(6, 17, 12, .55) 82%, rgba(6, 17, 12, .9) 100%); }
+.topbar, main, footer { position: relative; z-index: 2; }
+.hero { min-height: calc(100svh - 58px); max-width: 1180px; margin: 0 auto; padding: 7vh var(--gutter-r) 6vh var(--gutter); display: flex; flex-direction: column; justify-content: flex-start; gap: 14px; }
+.hero .eyebrow { align-self: flex-start; font: 500 11px/1 var(--f-data); letter-spacing: .16em; text-transform: uppercase; color: var(--mist); background: rgba(12, 26, 19, .55); padding: 7px 10px; border-radius: 6px; backdrop-filter: blur(6px); }
+.hero h1 { margin: 6px 0 0; font: 600 clamp(44px, 5.8vw, 82px)/.98 var(--f-display); letter-spacing: -.01em; color: var(--pine-900); max-width: 12ch; text-wrap: balance; }
+@media (min-width: 1000px) { .hero h1 { max-width: none; } .hero { padding-top: 5vh; } .strip img { aspect-ratio: 16 / 10; } }
+.hero .lede { margin: 0; max-width: 46ch; font: 500 italic clamp(19px, 2vw, 24px)/1.35 var(--f-display); color: #1c3328; }
+html[data-phase="night"] .hero h1, html[data-phase="dusk"] .hero h1, html[data-phase="dawn"] .hero h1 { color: var(--snow); text-shadow: 0 2px 30px rgba(0, 0, 0, .4); }
+html[data-phase="night"] .hero .lede, html[data-phase="dusk"] .hero .lede, html[data-phase="dawn"] .hero .lede { color: var(--mist); }
+.tabs { margin-top: auto; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px; -webkit-overflow-scrolling: touch; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 0 0 auto; border: 1px solid rgba(255, 255, 255, .28); background: rgba(12, 26, 19, .5); color: var(--mist); backdrop-filter: blur(10px);
+  font: 600 clamp(17px, 1.6vw, 21px)/1 var(--f-display); padding: 12px 18px; border-radius: 999px; cursor: pointer; transition: background .2s, color .2s; }
+.tabs button:hover { border-color: var(--resin); }
+.tabs button[aria-selected="true"] { background: var(--mist); color: var(--pine-900); border-color: var(--mist); }
+.panel { background: rgba(10, 24, 17, .72); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(14px); padding: 22px 24px; max-width: 640px;
+  display: grid; gap: 10px; animation: rise .5s ease; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.panel .pe { font: 500 11px/1.2 var(--f-data); letter-spacing: .14em; text-transform: uppercase; color: var(--emerald-hi); }
+.panel h2 { margin: 0; font: 600 clamp(34px, 4.4vw, 54px)/1 var(--f-display); color: var(--snow); }
+.panel .pt { margin: 0; color: var(--mist-2); font-size: 17px; }
+.panel .pm { margin: 0; color: var(--mist-3); font-size: 14px; }
+.panel .pm b { color: var(--resin-hi); font: 500 11px/1 var(--f-data); letter-spacing: .14em; text-transform: uppercase; margin-right: 8px; }
+.strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 4px 0; }
+.strip img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; display: block; background: var(--pine-800); }
+html[data-phase="night"] .strip img { filter: brightness(.82) saturate(.85); }
+footer.hub details { color: var(--mist-3); font-size: 13px; }
+footer.hub summary { cursor: pointer; }
+footer.hub ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 2px; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 4px 0 2px; font: 500 13px/1.2 var(--f-data); color: var(--mist-3); }
+.stats b { color: var(--snow); font-size: 20px; margin-right: 6px; }
+.cta { justify-self: start; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; background: var(--resin); color: #2a1a08; text-decoration: none;
+  font-weight: 600; padding: 13px 22px; border-radius: 999px; transition: background .2s; }
+.cta:hover { background: var(--resin-hi); }
+.indep { font-size: 13px; color: var(--mist); background: rgba(12, 26, 19, .55); padding: 7px 10px; border-radius: 6px; align-self: flex-start; backdrop-filter: blur(6px); margin: 0; }
+.indep a { color: var(--snow); }
+.all { background: linear-gradient(180deg, rgba(6, 17, 12, 0), var(--pine-950) 120px); padding: 70px var(--gutter-r) 60px var(--gutter); }
+.all .in { max-width: 1180px; margin: 0 auto; }
+.all h2 { margin: 0; font: 600 clamp(32px, 4vw, 52px)/1.05 var(--f-display); color: var(--snow); }
+.all .sub { margin: 8px 0 26px; color: var(--mist-3); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+.pk { display: grid; grid-template-rows: auto 1fr; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: transform .25s, border-color .25s; }
+.pk:hover { transform: translateY(-3px); border-color: var(--resin); }
+.pk .im { aspect-ratio: 4 / 3; background-size: cover; background-position: 50% 62%; }
+html[data-phase="night"] .pk .im { filter: brightness(.7) saturate(.7); }
+.pk .tx { padding: 14px 16px 16px; display: grid; gap: 6px; align-content: start; }
+.pk b { font: 600 24px/1.05 var(--f-display); color: var(--snow); }
+.pk span { font-size: 14px; color: var(--mist-2); }
+.pk small { font: 500 11px/1.2 var(--f-data); color: var(--mist-3); letter-spacing: .06em; }
+footer.hub { padding: 30px var(--gutter-r) 50px var(--gutter); background: var(--pine-950); border-top: 1px solid var(--line); }
+footer.hub .in { max-width: 1180px; margin: 0 auto; display: grid; gap: 8px; color: var(--mist-3); font-size: 14px; }
+footer.hub a { color: var(--mist-2); }
+@media (max-width: 640px) {
+  .hero { padding-top: 4vh; gap: 12px; }
+  .panel { padding: 18px; }
+  .stats b { font-size: 18px; }
+}
+</style>
 </head>
-<body><p>MonTop · <a href="https://durmitornationalpark.me/">Durmitor</a></p></body>
+<body>
+<div class="stage" aria-hidden="true"><img alt="" id="bg-a"><img alt="" id="bg-b"><div class="night"></div><div class="moon"></div><div class="shade"></div></div>
+<header class="topbar">
+  <div class="in">
+    <a class="brand" href="./" aria-label="MonTop"><span class="word">Mon<i>Top</i></span><span class="reg">Crna Gora</span></a>
+    <div class="tools">
+      <button class="pill mode" type="button" data-mode-cycle title="Day and night"><svg class="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/></svg><svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><span id="mode-name">Auto</span></button>
+      <div class="langs" role="group" aria-label="Language"><button type="button" data-lang="me">ME</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button></div>
+    </div>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <span class="eyebrow" data-t="eyebrow">Independent guide · Montenegro</span>
+    <h1 data-t="h1">Montenegro’s national parks</h1>
+    <p class="lede" data-t="lede"></p>
+    <div class="tabs" role="tablist" id="tabs" aria-label="National parks"></div>
+    <div class="panel" role="tabpanel" id="panel" aria-live="polite"></div>
+    <p class="indep"><span data-t="indep"></span> <a href="https://nparkovi.me/" target="_blank" rel="noopener" data-t="official">Official site: nparkovi.me</a></p>
+  </section>
+  <section class="all">
+    <div class="in">
+      <h2 data-t="all">All five parks</h2>
+      <p class="sub" id="all-sub"></p>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+</main>
+<footer class="hub"><div class="in">
+  <div><b style="color:var(--mist)">MonTop</b> · <span data-t="foot"></span></div>
+  <div data-t="soon"></div>
+  <div><a id="biz-link" href="lovcen/#biz"><span data-t="biz"></span> →</a></div>
+  <details><summary data-t="photos">Photos</summary><ul><li><a href="https://commons.wikimedia.org/wiki/File:Crno_jezero_-_3.jpg" target="_blank" rel="noopener">Crno jezero - 3.jpg</a> · Ingo Mehling · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Bobotov_Kuk.jpg" target="_blank" rel="noopener">Bobotov Kuk.jpg</a> · Goran.Smith2 · CC BY-SA 3.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Montenegro_Tara_bridge.JPG" target="_blank" rel="noopener">Montenegro Tara bridge.JPG</a> · Cornelius Bechtler · CC BY-SA 3.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Jezerski_vrh_(Lov%C4%87en_national_park),_Primorska_Planinarska_Transverzala,_Montenegro_104.jpg" target="_blank" rel="noopener">Jezerski vrh (Lovćen national park), Primorska Planinarska Transverzala, Montenegro 104.jpg</a> · Michal Klajban · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Cetinje-Njegu%C5%A1i-Kotor,_regionalni_put_R-1,_Crna_Gora_02.jpg" target="_blank" rel="noopener">Cetinje-Njeguši-Kotor, regionalni put R-1, Crna Gora 02.jpg</a> · Milica Buha · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Njegu%C5%A1i_-_panoramio.jpg" target="_blank" rel="noopener">Njeguši - panoramio.jpg</a> · trolvag · CC BY-SA 3.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Skadar_Lake,_Montenegro_14.jpg" target="_blank" rel="noopener">Skadar Lake, Montenegro 14.jpg</a> · Miomir Magdevski · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Pavlova_Strana,_Rijeka_Crnojevi%C4%87a,_Cetinje.jpg" target="_blank" rel="noopener">Pavlova Strana, Rijeka Crnojevića, Cetinje.jpg</a> · A81t · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Rijeka_Crnojevica_Port.jpg" target="_blank" rel="noopener">Rijeka Crnojevica Port.jpg</a> · Ingo Mehling · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Biogradsko_jezero_in_July.jpg" target="_blank" rel="noopener">Biogradsko jezero in July.jpg</a> · Javier Sánchez Portero · CC BY-SA 3.0</li><li><a href="https://commons.wikimedia.org/wiki/File:BiogradskoJezeroSteg.jpg" target="_blank" rel="noopener">BiogradskoJezeroSteg.jpg</a> · Ramessos · CC BY-SA 3.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Biogradsko_jezero_(1).JPG" target="_blank" rel="noopener">Biogradsko jezero (1).JPG</a> · Avi1111 dr. avishai teicher · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Maja_Vukoces_01.jpg" target="_blank" rel="noopener">Maja Vukoces 01.jpg</a> · Marko Randjic · CC BY-SA 4.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Peaks_of_the_Balkans_-_156_(38175766684).jpg" target="_blank" rel="noopener">Peaks of the Balkans - 156 (38175766684).jpg</a> · Bruno Rijsman · CC BY 2.0</li><li><a href="https://commons.wikimedia.org/wiki/File:Heading_West_(10470602095).jpg" target="_blank" rel="noopener">Heading West (10470602095).jpg</a> · amir appel from Israel · CC BY 2.0</li></ul></details>
+</div></footer>
+<script>
+(function () {
+  var PARKS = [{"id": "durmitor", "url": "https://durmitornationalpark.me/", "name": {"me": "Durmitor", "en": "Durmitor", "ru": "Дурмитор"}, "eyebrow": {"me": "Nacionalni park · UNESCO · 2523 m", "en": "National park · UNESCO · 2523 m", "ru": "Национальный парк · ЮНЕСКО · 2523 м"}, "tag": {"winter": {"me": "Dubok snijeg, zaleđeno Crno jezero i skijanje na Savinom kuku.", "en": "Deep snow, a frozen Black Lake and skiing on Savin Kuk.", "ru": "Глубокий снег, замёрзшее Чёрное озеро и лыжи на Савином Куке."}, "spring": {"me": "Snijeg se topi, vodopadi huče, Tara je puna vode.", "en": "The snow melts, waterfalls roar, the Tara runs high.", "ru": "Тает снег, шумят водопады, Тара полна воды."}, "summer": {"me": "Sve staze su otvorene: vrhovi, jezera, noći pod zvijezdama.", "en": "Every trail is open: summits, lakes, nights under the stars.", "ru": "Все тропы открыты: вершины, озёра, ночи под звёздами."}, "autumn": {"me": "Zlatne bukve, magla u dolinama i prvi snijeg na vrhovima.", "en": "Golden beech woods, mist in the valleys, first snow on the peaks.", "ru": "Золотые буки, туман в долинах и первый снег на вершинах."}}, "hikes": 8, "drives": 3, "ticket": "5 €", "month": [{"me": "Dubok snijeg na visoravni, ski staze rade kad ima snijega. Crno jezero je zaleđeno.", "en": "Deep snow on the plateau; the ski slopes run when there is snow. Black Lake is frozen.", "ru": "Глубокий снег на плато, трассы работают, когда есть снег. Чёрное озеро во льду."}, {"me": "Najhladniji dio zime. Krplje, skije i kratki dani.", "en": "The coldest stretch of winter. Snowshoes, skis and short days.", "ru": "Самая холодная часть зимы. Снегоступы, лыжи и короткие дни."}, {"me": "Na visoravni još zima, ali dani su duži i sunčaniji.", "en": "Still winter on the plateau, but the days are longer and brighter.", "ru": "На плато ещё зима, но дни длиннее и солнечнее."}, {"me": "Snijeg se topi niže dolje, rijeke su pune vode.", "en": "Snow melts lower down and the rivers run full.", "ru": "Внизу тает снег, реки полноводны."}, {"me": "Livade zelene, visoke staze su još pod snijegom. Put preko Sedla se otvara kasnije.", "en": "Meadows turn green; high trails are still under snow. The Sedlo road opens later.", "ru": "Луга зеленеют, высокие тропы ещё под снегом. Дорога через Седло открывается позже."}, {"me": "Cvjetaju livade, na visini ostaju snježna polja.", "en": "Meadows bloom; snowfields linger up high.", "ru": "Цветут луга, наверху ещё лежат снежники."}, {"me": "Najbolje vrijeme za vrhove. Krenite rano, poslije podne su oluje.", "en": "Prime time for summits. Start early: storms come in the afternoon.", "ru": "Лучшее время для вершин. Выходите рано: после обеда грозы."}, {"me": "Vrhunac sezone. Smještaj rezervišite unaprijed.", "en": "Peak season. Book your stay early.", "ru": "Пик сезона. Жильё бронируйте заранее."}, {"me": "Manje ljudi, bistar vazduh, staze su još otvorene.", "en": "Fewer people, clear air, trails still open.", "ru": "Меньше людей, прозрачный воздух, тропы ещё открыты."}, {"me": "Bukve žute, jutra su sa mrazem. Visoke staze do prvog snijega.", "en": "Beeches turn gold, mornings bring frost. High trails until the first snow.", "ru": "Буки желтеют, по утрам заморозки. Высокие тропы до первого снега."}, {"me": "Prvi snijeg na vrhovima, visoke staze se zatvaraju. Od 15. novembra zimska oprema.", "en": "First snow on the peaks; high trails close. Winter tyres from 15 November.", "ru": "Первый снег на вершинах, высокие тропы закрываются. С 15 ноября зимняя резина."}, {"me": "Snijeg stiže na visoravan. Ski sezona počinje kad ga ima dovoljno.", "en": "Snow reaches the plateau. Ski season starts once there is enough.", "ru": "Снег приходит на плато. Лыжный сезон начинается, когда его хватает."}], "ph": ["assets/hub/ph/durmitor-crno-jezero.jpg", "assets/hub/ph/durmitor-bobotov-kuk.jpg", "assets/hub/ph/durmitor-drive-bridge.jpg"]}, {"id": "lovcen", "url": "lovcen/", "name": {"me": "Lovćen", "en": "Lovćen", "ru": "Ловчен"}, "eyebrow": {"me": "Nacionalni park · od 1952. · 1749 m", "en": "National park · since 1952 · 1749 m", "ru": "Национальный парк · с 1952 года · 1749 м"}, "tag": {"winter": {"me": "Snijeg u bukovoj šumi, a more duboko ispod.", "en": "Snow in the beech woods, the sea far below.", "ru": "Снег в буковом лесу, а море далеко внизу."}, "spring": {"me": "Cvjeta livada, vazduh je bistar, pogled seže do zaliva.", "en": "Meadows in flower, clear air, views down to the bay.", "ru": "Цветут луга, воздух прозрачный, видно залив."}, "summer": {"me": "Bijeg od vrućine sa obale: hlad bukve i vjetar sa vrha.", "en": "An escape from the coastal heat: beech shade and a breeze at the top.", "ru": "Побег от жары побережья: тень буков и ветер на вершине."}, "autumn": {"me": "Bukve žute, staze su prazne, pogled seže do mora.", "en": "Golden beeches, quiet trails, views down to the sea.", "ru": "Желтеют буки, тропы пустеют, видно до самого моря."}}, "hikes": 4, "drives": 2, "ticket": "3 €", "month": [{"me": "Mauzolej je zatvoren do 10. aprila. Šuma je otvorena i tiha.", "en": "The mausoleum is closed until 10 April. The woods stay open and quiet.", "ru": "Мавзолей закрыт до 10 апреля. Лес открыт и тих."}, {"me": "Zima u parku: krplje se iznajmljuju za 4 € dnevno.", "en": "Winter in the park: snowshoes for hire at €4 a day.", "ru": "Зима в парке: снегоступы напрокат за 4 € в день."}, {"me": "Do 31. marta u autu mora biti zimska oprema.", "en": "Winter equipment is required in the car until 31 March.", "ru": "До 31 марта в машине обязательна зимняя резина."}, {"me": "Od 11. aprila mauzolej je ponovo otvoren, 9–16 h.", "en": "From 11 April the mausoleum reopens, 9:00–16:00.", "ru": "С 11 апреля мавзолей снова открыт, 9:00–16:00."}, {"me": "Livade cvjetaju. Dobro vrijeme za stari put iz Kotora.", "en": "Meadows bloom. A good time for the old path up from Kotor.", "ru": "Цветут луга. Хорошее время для старой тропы из Котора."}, {"me": "Dugi dani. Na stari put krenite rano, prije vrućine.", "en": "Long days. Start the old path early, before the heat.", "ru": "Длинные дни. На старую тропу выходите рано, до жары."}, {"me": "Na obali je vruće, gore je prijatnije. Šumske staze su u hladu.", "en": "Hot on the coast, kinder up here. The forest trails are shaded.", "ru": "На побережье жарко, наверху приятнее. Лесные тропы в тени."}, {"me": "Vrh sezone: na mauzolej stignite ujutro.", "en": "Peak season: reach the mausoleum in the morning.", "ru": "Пик сезона: к мавзолею приезжайте утром."}, {"me": "Manje ljudi, bistar vazduh, daleki pogledi.", "en": "Fewer people, clear air, long views.", "ru": "Меньше людей, прозрачный воздух, далёкие виды."}, {"me": "Bukve mijenjaju boju. Idealno za šumske staze.", "en": "The beeches turn. Ideal for forest walks.", "ru": "Буки меняют цвет. Лучшее время для лесных троп."}, {"me": "Mauzolej radi do 15. novembra. Od 15. novembra zimska oprema.", "en": "The mausoleum is open until 15 November. Winter equipment from 15 November.", "ru": "Мавзолей открыт до 15 ноября. С 15 ноября зимняя резина."}, {"me": "Tišina i prvi snijeg. Mauzolej je zatvoren, šuma nije.", "en": "Quiet and the first snow. The mausoleum is closed, the forest is not.", "ru": "Тишина и первый снег. Мавзолей закрыт, лес — нет."}], "ph": ["assets/hub/ph/lovcen-jezerski-vrh.jpg", "assets/hub/ph/lovcen-drive-serpentine.jpg", "assets/hub/ph/lovcen-njegusi.jpg"]}, {"id": "skadar", "url": "skadarsko-jezero/", "name": {"me": "Skadarsko jezero", "en": "Lake Skadar", "ru": "Скадарское озеро"}, "eyebrow": {"me": "Nacionalni park · od 1983. · 280 vrsta ptica", "en": "National park · since 1983 · 280 bird species", "ru": "Национальный парк · с 1983 года · 280 видов птиц"}, "tag": {"winter": {"me": "Mirna voda, magla u jutrima i jata ptica koje ovdje zimuju.", "en": "Still water, misty mornings and flocks of birds that winter here.", "ru": "Тихая вода, туманные утра и стаи зимующих птиц."}, "spring": {"me": "Jezero raste, sela cvjetaju, stižu pelikani i čaplje.", "en": "The lake rises, villages bloom, pelicans and herons return.", "ru": "Озеро разливается, сёла цветут, возвращаются пеликаны и цапли."}, "summer": {"me": "Lokvanji na vodi, kajak u zoru i kupanje na Murićima.", "en": "Water lilies on the lake, a kayak at dawn and a swim at Murići.", "ru": "Кувшинки на воде, каяк на рассвете и купание в Мурицах."}, "autumn": {"me": "Zlatna trska, berba u Crmnici i topla voda do oktobra.", "en": "Golden reeds, the grape harvest in Crmnica and warm water into October.", "ru": "Золотые камыши, сбор винограда в Црмнице и тёплая вода до октября."}}, "hikes": 4, "drives": 3, "ticket": "5 €", "month": [{"me": "Zima na jezeru: ptice selice, mirna voda, malo ljudi.", "en": "Winter on the lake: migrant birds, still water, few people.", "ru": "Зима на озере: перелётные птицы, тихая вода, мало людей."}, {"me": "Dobro vrijeme za ptice: ponesite dvogled.", "en": "A good time for birds: bring binoculars.", "ru": "Хорошее время для птиц: возьмите бинокль."}, {"me": "Proljeće stiže rano: livade oko jezera ozelene.", "en": "Spring comes early: the meadows round the lake turn green.", "ru": "Весна приходит рано: луга вокруг озера зеленеют."}, {"me": "Voda je visoka, sela su u cvijeću. Dobro vrijeme za Rumiju.", "en": "High water and villages in flower. A good time for Rumija.", "ru": "Высокая вода, сёла в цвету. Хорошее время для Румии."}, {"me": "Prijatno za čamac, kajak i staze.", "en": "Pleasant for boats, kayaks and trails.", "ru": "Приятно для лодки, каяка и троп."}, {"me": "Lokvanji počinju da cvjetaju. Jutra su najljepša na vodi.", "en": "The water lilies begin to bloom. Mornings are the best time on the water.", "ru": "Начинают цвести кувшинки. Утро — лучшее время на воде."}, {"me": "Vrućina: na vodu rano ujutro ili predveče, kupanje na Murićima.", "en": "Heat: get on the water early or late, swim at Murići.", "ru": "Жара: на воду рано утром или вечером, купание в Мурицах."}, {"me": "Vrh sezone. Kajak u zoru, ručak u hladu Virpazara.", "en": "Peak season. Kayak at dawn, lunch in the shade in Virpazar.", "ru": "Пик сезона. Каяк на рассвете, обед в тени Вирпазара."}, {"me": "Berba grožđa u Crmnici, voda je još topla.", "en": "Grape harvest in Crmnica, the water is still warm.", "ru": "Сбор винограда в Црмнице, вода ещё тёплая."}, {"me": "Trska žuti, staze su ugodne, manje ljudi.", "en": "The reeds turn gold, trails are pleasant, fewer people.", "ru": "Камыши желтеют, на тропах приятно, людей меньше."}, {"me": "Stižu ptice na zimovanje. Od 15. novembra zimska oprema.", "en": "Birds arrive for the winter. Winter equipment from 15 November.", "ru": "Прилетают птицы на зимовку. С 15 ноября зимняя резина."}, {"me": "Tiho jezero i magla u jutrima.", "en": "A quiet lake and misty mornings.", "ru": "Тихое озеро и туманные утра."}], "ph": ["assets/hub/ph/skadar-lake.jpg", "assets/hub/ph/skadar-orahovstica.jpg", "assets/hub/ph/skadar-drive-rijeka.jpg"]}, {"id": "biogradska", "url": "biogradska-gora/", "name": {"me": "Biogradska gora", "en": "Biogradska Gora", "ru": "Биоградска-Гора"}, "eyebrow": {"me": "Nacionalni park · prašuma · zaštićena od 1878.", "en": "National park · primeval forest · protected since 1878", "ru": "Национальный парк · пралес · под охраной с 1878 года"}, "tag": {"winter": {"me": "Prašuma pod snijegom, a u Kolašinu skijanje.", "en": "The old forest under snow, and skiing in Kolašin.", "ru": "Пралес под снегом, а в Колашине лыжи."}, "spring": {"me": "Bukve listaju, potoci su puni, jezero je mirno i zeleno.", "en": "Beeches in new leaf, full streams, a calm green lake.", "ru": "Буки распускаются, ручьи полны, озеро тихое и зелёное."}, "summer": {"me": "Hlad stoljetnih stabala, katuni i gorska jezera Bjelasice.", "en": "Shade from centuries-old trees, shepherd huts and the mountain lakes of Bjelasica.", "ru": "Тень вековых деревьев, катуны и горные озёра Бьеласицы."}, "autumn": {"me": "Najljepše doba: bukve i javori gore u bojama nad jezerom.", "en": "The finest season: beeches and maples ablaze over the lake.", "ru": "Лучшее время: буки и клёны горят красками над озером."}}, "hikes": 3, "drives": 2, "ticket": "4 €", "month": [{"me": "Šuma pod snijegom, Kolašin skija.", "en": "The forest under snow; Kolašin is skiing.", "ru": "Лес под снегом, Колашин катается на лыжах."}, {"me": "Najhladniji mjesec. Park iznajmljuje krplje za 4 € dnevno.", "en": "The coldest month. The park rents snowshoes for €4 a day.", "ru": "Самый холодный месяц. Парк сдаёт снегоступы за 4 € в день."}, {"me": "Niže se snijeg topi, na Bjelasici je još zima.", "en": "Snow melts lower down; Bjelasica is still in winter.", "ru": "Внизу тает снег, на Бьеласице ещё зима."}, {"me": "Bukve listaju, potoci su puni vode.", "en": "Beeches come into leaf, streams run full.", "ru": "Буки распускаются, ручьи полны воды."}, {"me": "Šuma je svijetlozelena, cvjetaju livade.", "en": "The forest is bright green, the meadows bloom.", "ru": "Лес светло-зелёный, цветут луга."}, {"me": "Katuni oživljavaju: stoka ide na planinu.", "en": "The shepherd huts come alive as herds move up the mountain.", "ru": "Оживают катуны: скот поднимается в горы."}, {"me": "Najbolje vrijeme za vrhove Bjelasice i gorska jezera.", "en": "Best time for the Bjelasica summits and mountain lakes.", "ru": "Лучшее время для вершин Бьеласицы и горных озёр."}, {"me": "Vrh sezone na jezeru: dođite ujutro.", "en": "Peak season at the lake: come in the morning.", "ru": "Пик сезона на озере: приезжайте утром."}, {"me": "Mirnije, prvi žuti listovi.", "en": "Quieter, the first yellow leaves.", "ru": "Спокойнее, первые жёлтые листья."}, {"me": "Najljepši mjesec: šuma u bojama oko jezera.", "en": "The finest month: the forest in colour round the lake.", "ru": "Самый красивый месяц: лес в красках вокруг озера."}, {"me": "Lišće pada, magla nad jezerom. Od 15. novembra zimska oprema.", "en": "Leaves fall, mist over the lake. Winter equipment from 15 November.", "ru": "Листья опадают, туман над озером. С 15 ноября зимняя резина."}, {"me": "Prvi snijeg; Kolašin čeka ski sezonu.", "en": "First snow; Kolašin waits for the ski season.", "ru": "Первый снег; Колашин ждёт лыжного сезона."}], "ph": ["assets/hub/ph/biogradska-jezero-krug.jpg", "assets/hub/ph/biogradska-forest.jpg", "assets/hub/ph/biogradska-lake.jpg"]}, {"id": "prokletije", "url": "prokletije/", "name": {"me": "Prokletije", "en": "Prokletije", "ru": "Проклетие"}, "eyebrow": {"me": "Nacionalni park · od 2009. · 2534 m", "en": "National park · since 2009 · 2534 m", "ru": "Национальный парк · с 2009 года · 2534 м"}, "tag": {"winter": {"me": "Duboki snijeg u dolinama, tišina i krplje.", "en": "Deep snow in the valleys, silence and snowshoes.", "ru": "Глубокий снег в долинах, тишина и снегоступы."}, "spring": {"me": "Snijeg se topi, a izvori i vodopadi su najjači.", "en": "The snow melts and the springs and waterfalls run strongest.", "ru": "Тает снег, источники и водопады в полной силе."}, "summer": {"me": "Otvoreni grebeni, kameni tornjevi i najviši vrh Crne Gore.", "en": "Open ridges, stone towers and Montenegro’s highest summit.", "ru": "Открытые гребни, каменные башни и высшая точка Черногории."}, "autumn": {"me": "Bukve u dolinama žute, prvi snijeg na vrhovima.", "en": "Beeches turn gold in the valleys, first snow on the peaks.", "ru": "Буки желтеют в долинах, первый снег на вершинах."}}, "hikes": 4, "drives": 2, "ticket": "3 €", "month": [{"me": "Dubok snijeg u dolinama. Park iznajmljuje krplje za 4 € dnevno.", "en": "Deep snow in the valleys. The park rents snowshoes for €4 a day.", "ru": "Глубокий снег в долинах. Парк сдаёт снегоступы за 4 € в день."}, {"me": "Najhladniji dio zime; putevi do sela mogu biti pod snijegom.", "en": "The coldest part of winter; village roads can be snowbound.", "ru": "Самая холодная часть зимы; дороги к сёлам могут быть под снегом."}, {"me": "Dani su duži, snijeg u dolinama se povlači.", "en": "Longer days; the snow retreats from the valleys.", "ru": "Дни длиннее, снег уходит из долин."}, {"me": "Izvori i vodopadi su najjači.", "en": "Springs and waterfalls are at their strongest.", "ru": "Источники и водопады в полной силе."}, {"me": "Doline zelene, visoko je još snijeg.", "en": "The valleys are green; snow remains up high.", "ru": "Долины зеленеют, наверху ещё снег."}, {"me": "Otvaraju se visoke staze; snijeg ostaje u žlijebovima.", "en": "High trails open; snow lingers in the gullies.", "ru": "Открываются высокие тропы; в кулуарах лежит снег."}, {"me": "Najbolje za Zla Kolata i grebene. Krenite rano: poslije podne su oluje.", "en": "Best for Zla Kolata and the ridges. Start early: storms come in the afternoon.", "ru": "Лучшее время для Зла-Колаты и гребней. Выходите рано: после обеда грозы."}, {"me": "Vrh sezone na stazi Peaks of the Balkans.", "en": "Peak season on the Peaks of the Balkans trail.", "ru": "Пик сезона на тропе Peaks of the Balkans."}, {"me": "Stabilno vrijeme, manje ljudi.", "en": "Settled weather, fewer people.", "ru": "Устойчивая погода, меньше людей."}, {"me": "Bukve u dolinama žute, prvi snijeg na vrhovima.", "en": "Beeches turn gold in the valleys, first snow on the peaks.", "ru": "Буки в долинах желтеют, первый снег на вершинах."}, {"me": "Visoke staze se zatvaraju. Od 15. novembra zimska oprema.", "en": "High trails close. Winter equipment from 15 November.", "ru": "Высокие тропы закрываются. С 15 ноября зимняя резина."}, {"me": "Zima stiže u Plav i Gusinje.", "en": "Winter reaches Plav and Gusinje.", "ru": "Зима приходит в Плав и Гусинье."}], "ph": ["assets/hub/ph/prokletije-drive-grbaja.jpg", "assets/hub/ph/prokletije-zla-kolata.jpg", "assets/hub/ph/prokletije-drive-vusanje.jpg"]}], TX = {"me": {"eyebrow": "Nezavisni vodič · Crna Gora", "h1": "Nacionalni parkovi Crne Gore", "lede": "Pet parkova na jednom mjestu: staze sa GPX tragom, putevi sa tačkama za navigaciju, šta obući i gdje spavati.", "tabs": "Izaberite park", "open": "Otvori vodič", "trails": "staza", "drives": "puta autom", "ticket": "ulaznica", "all": "Svih pet parkova", "allLede": "Šta je lijepo u kom parku ove sezone.", "now": "Sada", "indep": "Nezavisni vodič, nije zvanični sajt parkova.", "official": "Zvanični sajt: nparkovi.me", "foot": "Vodič kroz nacionalne parkove i planine Crne Gore.", "soon": "Uskoro: Kolašin, obala, rute za kampere, motocikle i bicikle.", "biz": "Imate smještaj, vodičku agenciju ili rent-a-car? Pišite nam.", "seasons": {"winter": "Zima", "spring": "Proljeće", "summer": "Ljeto", "autumn": "Jesen"}, "mode": {"auto": "Auto", "day": "Dan", "night": "Noć"}, "photos": "Fotografije: Wikimedia Commons", "modeTitle": "Dan i noć", "title": "MonTop: nacionalni parkovi Crne Gore"}, "en": {"eyebrow": "Independent guide · Montenegro", "h1": "Montenegro’s national parks", "lede": "Five parks in one place: trails with GPX tracks, drives with points for your navigator, what to wear and where to stay.", "tabs": "Pick a park", "open": "Open the guide", "trails": "trails", "drives": "drives", "ticket": "ticket", "all": "All five parks", "allLede": "What is beautiful where, this season.", "now": "Now", "indep": "Independent guide, not the parks’ official website.", "official": "Official site: nparkovi.me", "foot": "A guide to the national parks and mountains of Montenegro.", "soon": "Coming next: Kolašin, the coast, routes for campervans, motorbikes and bicycles.", "biz": "Run a stay, a guiding business or a car rental? Write to us.", "seasons": {"winter": "Winter", "spring": "Spring", "summer": "Summer", "autumn": "Autumn"}, "mode": {"auto": "Auto", "day": "Day", "night": "Night"}, "photos": "Photos: Wikimedia Commons", "modeTitle": "Day and night", "title": "MonTop: Montenegro’s national parks"}, "ru": {"eyebrow": "Независимый гид · Черногория", "h1": "Национальные парки Черногории", "lede": "Пять парков в одном месте: тропы с GPX-треками, автомаршруты с точками для навигатора, что надеть и где жить.", "tabs": "Выберите парк", "open": "Открыть гид", "trails": "троп", "drives": "автомаршрутов", "ticket": "вход", "all": "Все пять парков", "allLede": "Где что красиво в этом сезоне.", "now": "Сейчас", "indep": "Независимый гид, не официальный сайт парков.", "official": "Официальный сайт: nparkovi.me", "foot": "Гид по национальным паркам и горам Черногории.", "soon": "Скоро: Колашин, побережье, маршруты для кемперов, мотоциклов и велосипедов.", "biz": "У вас жильё, гиды или прокат машин? Напишите нам.", "seasons": {"winter": "Зима", "spring": "Весна", "summer": "Лето", "autumn": "Осень"}, "mode": {"auto": "Авто", "day": "День", "night": "Ночь"}, "photos": "Фото: Wikimedia Commons", "modeTitle": "День и ночь", "title": "MonTop: национальные парки Черногории"}};
+  var BY = ["winter", "winter", "winter", "spring", "spring", "summer", "summer", "summer", "summer", "autumn", "autumn", "winter"];
+  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  function detect() {
+    var s = store.get("mt-lang"); if (s && TX[s]) return s;
+    var ls = navigator.languages || [navigator.language || "en"];
+    for (var i = 0; i < ls.length; i++) { var l = (ls[i] || "").toLowerCase();
+      if (/^(sr|cnr|hr|bs|me)\b/.test(l)) return "me"; if (/^ru\b/.test(l)) return "ru"; if (/^en\b/.test(l)) return "en"; }
+    return "en";
+  }
+  var lang = detect(), now = new Date(), season = BY[now.getMonth()];
+  var L = function (o) { return o ? (o[lang] != null ? o[lang] : o.en) : ""; };
+  var tab = (location.hash || "").slice(1);
+  if (!PARKS.some(function (p) { return p.id === tab; })) tab = store.get("mt-hub-tab") || PARKS[0].id;
+  if (!PARKS.some(function (p) { return p.id === tab; })) tab = PARKS[0].id;
+  document.documentElement.setAttribute("data-season", season);
+
+  function sunAlt(date, lat, lon) {
+    var rad = Math.PI / 180, d = (date.getTime() - Date.UTC(2000, 0, 1, 12)) / 864e5;
+    var g = (357.529 + 0.98560028 * d) % 360, q = (280.459 + 0.98564736 * d) % 360;
+    var Lm = q + 1.915 * Math.sin(g * rad) + 0.02 * Math.sin(2 * g * rad), e = 23.439 - 0.00000036 * d;
+    var RA = Math.atan2(Math.cos(e * rad) * Math.sin(Lm * rad), Math.cos(Lm * rad)) / rad;
+    var dec = Math.asin(Math.sin(e * rad) * Math.sin(Lm * rad)) / rad;
+    var GMST = (18.697374558 + 24.06570982441908 * d) % 24, H = GMST * 15 + lon - RA;
+    return Math.asin(Math.sin(lat * rad) * Math.sin(dec * rad) + Math.cos(lat * rad) * Math.cos(dec * rad) * Math.cos(H * rad)) / rad;
+  }
+  var MODES = ["auto", "day", "night"], mode = MODES.indexOf(store.get("mt-mode")) > -1 ? store.get("mt-mode") : "auto";
+  function setPhase() {
+    var d = new Date(), a = sunAlt(d, 42.6, 19.4), ph = "day";
+    if (a < -6) ph = "night"; else if (a < 5) ph = d.getHours() < 12 ? "dawn" : "dusk";
+    if (mode !== "auto") ph = mode;
+    document.documentElement.setAttribute("data-phase", ph); document.documentElement.setAttribute("data-mode", mode);
+    $("#mode-name").textContent = TX[lang].mode[mode]; $("[data-mode-cycle]").title = TX[lang].modeTitle;
+  }
+  var cur = "a";
+  function showBg(id) {
+    var src = "assets/hub/" + id + "-" + season + ".jpg", on = $("#bg-" + cur);
+    if (on.getAttribute("src") === src && on.classList.contains("on")) return;
+    var nx = cur === "a" ? "b" : "a", img = $("#bg-" + nx);
+    img.onload = function () { img.classList.add("on"); on.classList.remove("on"); cur = nx; };
+    img.src = src;
+  }
+  function park(id) { for (var i = 0; i < PARKS.length; i++) if (PARKS[i].id === id) return PARKS[i]; return PARKS[0]; }
+  function render() {
+    var T = TX[lang], p = park(tab);
+    document.documentElement.lang = lang === "me" ? "sr-Latn-ME" : lang;
+    document.title = T.title;
+    [].forEach.call(document.querySelectorAll("[data-t]"), function (el) { el.textContent = T[el.getAttribute("data-t")]; });
+    [].forEach.call(document.querySelectorAll("[data-lang]"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === lang); });
+    $("#tabs").setAttribute("aria-label", T.tabs);
+    $("#tabs").innerHTML = PARKS.map(function (q) {
+      return '<button type="button" role="tab" id="tab-' + q.id + '" aria-controls="panel" aria-selected="' + (q.id === tab) + '" data-tab="' + q.id + '">' + esc(L(q.name)) + "</button>";
+    }).join("");
+    var tb = $("#tabs"), sel = $("#tab-" + p.id); if (sel) tb.scrollLeft = sel.offsetLeft - tb.offsetLeft - (tb.clientWidth - sel.offsetWidth) / 2;
+    $("#panel").setAttribute("aria-labelledby", "tab-" + p.id);
+    $("#panel").innerHTML = '<div class="pe">' + esc(L(p.eyebrow)) + "</div><h2>" + esc(L(p.name)) + '</h2><p class="pt">' + esc(L(p.tag[season])) + "</p>" +
+      '<p class="pm"><b>' + esc(T.now) + "</b>" + esc(L(p.month[now.getMonth()])) + "</p>" +
+      '<div class="strip">' + p.ph.map(function (u) { return '<img src="' + u + '" alt="" loading="lazy">'; }).join("") + "</div>" +
+      '<div class="stats"><span><b>' + p.hikes + "</b>" + esc(T.trails) + "</span><span><b>" + p.drives + "</b>" + esc(T.drives) + "</span><span><b>" + esc(p.ticket) + "</b>" + esc(T.ticket) + "</span></div>" +
+      '<a class="cta" href="' + esc(p.url) + '">' + esc(T.open) + ' <span aria-hidden="true">→</span></a>';
+    $("#all-sub").textContent = T.seasons[season] + " · " + T.allLede;
+    $("#grid").innerHTML = PARKS.map(function (q) {
+      return '<a class="pk" href="' + esc(q.url) + '"><div class="im" style="background-image:url(\'assets/hub/' + q.id + "-" + season + '.jpg\')"></div><div class="tx"><small>' + esc(L(q.eyebrow)) +
+        "</small><b>" + esc(L(q.name)) + "</b><span>" + esc(L(q.tag[season])) + "</span></div></a>";
+    }).join("");
+    $("#biz-link").href = p.url + "#biz";
+    showBg(p.id); setPhase();
+  }
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-tab],[data-lang],[data-mode-cycle]"); if (!el) return;
+    if (el.hasAttribute("data-tab")) { tab = el.getAttribute("data-tab"); store.set("mt-hub-tab", tab); history.replaceState(null, "", "#" + tab); render(); }
+    else if (el.hasAttribute("data-lang")) { lang = el.getAttribute("data-lang"); store.set("mt-lang", lang); render(); }
+    else { mode = MODES[(MODES.indexOf(mode) + 1) % 3]; store.set("mt-mode", mode); setPhase(); }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (!e.target.hasAttribute || !e.target.hasAttribute("data-tab") || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+    var i = PARKS.findIndex(function (q) { return q.id === tab; }); i = (i + (e.key === "ArrowRight" ? 1 : PARKS.length - 1)) % PARKS.length;
+    tab = PARKS[i].id; store.set("mt-hub-tab", tab); render(); var b = $("#tab-" + tab); if (b) b.focus();
+  });
+  render(); setInterval(setPhase, 600000);
+})();
+</script>
+</body>
 </html>

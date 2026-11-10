@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="MonTop (montop guide)" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Besac fortress above Virpazar</name>
+    <desc>Track built from OpenStreetMap paths (ODbL, openstreetmap.org/copyright). Elevation: Copernicus DEM via Open-Meteo. One way. Check conditions before you go.</desc>
+  </metadata>
+  <wpt lat="42.24624" lon="19.09059"><ele>9</ele><name>Start</name></wpt>
+  <wpt lat="42.24438" lon="19.09257"><ele>32</ele><name>Goal</name></wpt>
+  <trk>
+    <name>Besac fortress above Virpazar</name>
+    <trkseg>
+      <trkpt lat="42.24624" lon="19.09059"><ele>9</ele></trkpt>
+      <trkpt lat="42.24632" lon="19.09081"><ele>9</ele></trkpt>
+      <trkpt lat="42.24629" lon="19.09102"><ele>8</ele></trkpt>
+      <trkpt lat="42.24621" lon="19.09124"><ele>8</ele></trkpt>
+      <trkpt lat="42.24615" lon="19.09147"><ele>8</ele></trkpt>
+      <trkpt lat="42.24607" lon="19.09168"><ele>8</ele></trkpt>
+      <trkpt lat="42.24591" lon="19.09179"><ele>8</ele></trkpt>
+      <trkpt lat="42.24574" lon="19.09188"><ele>8</ele></trkpt>
+      <trkpt lat="42.24562" lon="19.09206"><ele>9</ele></trkpt>
+      <trkpt lat="42.24551" lon="19.09225"><ele>10</ele></trkpt>
+      <trkpt lat="42.24539" lon="19.09242"><ele>11</ele></trkpt>
+      <trkpt lat="42.24528" lon="19.09262"><ele>14</ele></trkpt>
+      <trkpt lat="42.24518" lon="19.09282"><ele>15</ele></trkpt>
+      <trkpt lat="42.24506" lon="19.093"><ele>16</ele></trkpt>
+      <trkpt lat="42.24494" lon="19.09318"><ele>19</ele></trkpt>
+      <trkpt lat="42.24482" lon="19.09336"><ele>20</ele></trkpt>
+      <trkpt lat="42.24469" lon="19.0935"><ele>20</ele></trkpt>
+      <trkpt lat="42.24466" lon="19.0933"><ele>22</ele></trkpt>
+      <trkpt lat="42.24449" lon="19.09341"><ele>25</ele></trkpt>
+      <trkpt lat="42.24435" lon="19.09334"><ele>27</ele></trkpt>
+      <trkpt lat="42.24426" lon="19.09317"><ele>30</ele></trkpt>
+      <trkpt lat="42.2441" lon="19.09323"><ele>30</ele></trkpt>
+      <trkpt lat="42.24421" lon="19.09303"><ele>32</ele></trkpt>
+      <trkpt lat="42.24434" lon="19.09286"><ele>35</ele></trkpt>
+      <trkpt lat="42.24444" lon="19.09271"><ele>36</ele></trkpt>
+      <trkpt lat="42.24438" lon="19.09257"><ele>32</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="MonTop (montop guide)" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Velji Vrh above Vranjina</name>
+    <desc>Track built from OpenStreetMap paths (ODbL, openstreetmap.org/copyright). Elevation: Copernicus DEM via Open-Meteo. One way. Check conditions before you go.</desc>
+  </metadata>
+  <wpt lat="42.2784" lon="19.13406"><ele>9</ele><name>Start</name></wpt>
+  <wpt lat="42.27443" lon="19.13092"><ele>272</ele><name>Goal</name></wpt>
+  <trk>
+    <name>Velji Vrh above Vranjina</name>
+    <trkseg>
+      <trkpt lat="42.2784" lon="19.13406"><ele>9</ele></trkpt>
+      <trkpt lat="42.27823" lon="19.13414"><ele>9</ele></trkpt>
+      <trkpt lat="42.27811" lon="19.13406"><ele>10</ele></trkpt>
+      <trkpt lat="42.27794" lon="19.13407"><ele>14</ele></trkpt>
+      <trkpt lat="42.27778" lon="19.13413"><ele>19</ele></trkpt>
+      <trkpt lat="42.2776" lon="19.1341"><ele>23</ele></trkpt>
+      <trkpt lat="42.27744" lon="19.13421"><ele>28</ele></trkpt>
+      <trkpt lat="42.27729" lon="19.1342"><ele>32</ele></trkpt>
+      <trkpt lat="42.27718" lon="19.13419"><ele>37</ele></trkpt>
+      <trkpt lat="42.27708" lon="19.1342"><ele>41</ele></trkpt>
+      <trkpt lat="42.27701" lon="19.13441"><ele>41</ele></trkpt>
+      <trkpt lat="42.27699" lon="19.13462"><ele>42</ele></trkpt>
+      <trkpt lat="42.27686" lon="19.13453"><ele>51</ele></trkpt>
+      <trkpt lat="42.27677" lon="19.13432"><ele>59</ele></trkpt>
+      <trkpt lat="42.27668" lon="19.13411"><ele>68</ele></trkpt>
+      <trkpt lat="42.27657" lon="19.13395"><ele>75</ele></trkpt>
+      <trkpt lat="42.27644" lon="19.13391"><ele>81</ele></trkpt>
+      <trkpt lat="42.27627" lon="19.13401"><ele>88</ele></trkpt>
+      <trkpt lat="42.27619" lon="19.13421"><ele>94</ele></trkpt>
+      <trkpt lat="42.27605" lon="19.13436"><ele>97</ele></trkpt>
+      <trkpt lat="42.27596" lon="19.13457"><ele>100</ele></trkpt>
+      <trkpt lat="42.27583" lon="19.13474"><ele>103</ele></trkpt>
+      <trkpt lat="42.27569" lon="19.13488"><ele>109</ele></trkpt>
+      <trkpt lat="42.27555" lon="19.13477"><ele>114</ele></trkpt>
+      <trkpt lat="42.27553" lon="19.13454"><ele>119</ele></trkpt>
+      <trkpt lat="42.27544" lon="19.13449"><ele>127</ele></trkpt>
+      <trkpt lat="42.2753" lon="19.13439"><ele>131</ele></trkpt>
+      <trkpt lat="42.27513" lon="19.13446"><ele>134</ele></trkpt>
+      <trkpt lat="42.27495" lon="19.13448"><ele>138</ele></trkpt>
+      <trkpt lat="42.27479" lon="19.13458"><ele>141</ele></trkpt>
+      <trkpt lat="42.27461" lon="19.13462"><ele>145</ele></trkpt>
+      <trkpt lat="42.27447" lon="19.13478"><ele>148</ele></trkpt>
+      <trkpt lat="42.27435" lon="19.13494"><ele>152</ele></trkpt>
+      <trkpt lat="42.27424" lon="19.1348"><ele>157</ele></trkpt>
+      <trkpt lat="42.27418" lon="19.13459"><ele>166</ele></trkpt>
+      <trkpt lat="42.27414" lon="19.13436"><ele>175</ele></trkpt>
+      <trkpt lat="42.27402" lon="19.13419"><ele>183</ele></trkpt>
+      <trkpt lat="42.27386" lon="19.13409"><ele>192</ele></trkpt>
+      <trkpt lat="42.27377" lon="19.13389"><ele>201</ele></trkpt>
+      <trkpt lat="42.27366" lon="19.13371"><ele>210</ele></trkpt>
+      <trkpt lat="42.27352" lon="19.13356"><ele>220</ele></trkpt>
+      <trkpt lat="42.27346" lon="19.13336"><ele>225</ele></trkpt>
+      <trkpt lat="42.2735" lon="19.13314"><ele>233</ele></trkpt>
+      <trkpt lat="42.27349" lon="19.1329"><ele>242</ele></trkpt>
+      <trkpt lat="42.27349" lon="19.13266"><ele>251</ele></trkpt>
+      <trkpt lat="42.27353" lon="19.13245"><ele>260</ele></trkpt>
+      <trkpt lat="42.27363" lon="19.13225"><ele>267</ele></trkpt>
+      <trkpt lat="42.27365" lon="19.13202"><ele>273</ele></trkpt>
+      <trkpt lat="42.27366" lon="19.13179"><ele>280</ele></trkpt>
+      <trkpt lat="42.27374" lon="19.13157"><ele>282</ele></trkpt>
+      <trkpt lat="42.27382" lon="19.13137"><ele>284</ele></trkpt>
+      <trkpt lat="42.27384" lon="19.13115"><ele>287</ele></trkpt>
+      <trkpt lat="42.27391" lon="19.13095"><ele>286</ele></trkpt>
+      <trkpt lat="42.27398" lon="19.13074"><ele>283</ele></trkpt>
+      <trkpt lat="42.27411" lon="19.13058"><ele>281</ele></trkpt>
+      <trkpt lat="42.27428" lon="19.13054"><ele>278</ele></trkpt>
+      <trkpt lat="42.2744" lon="19.13037"><ele>275</ele></trkpt>
+      <trkpt lat="42.27457" lon="19.13037"><ele>273</ele></trkpt>
+      <trkpt lat="42.27467" lon="19.13054"><ele>271</ele></trkpt>
+      <trkpt lat="42.27457" lon="19.13072"><ele>272</ele></trkpt>
+      <trkpt lat="42.27445" lon="19.13089"><ele>272</ele></trkpt>
+      <trkpt lat="42.27443" lon="19.13092"><ele>272</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>
