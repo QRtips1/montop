@@ -414,3 +414,6 @@ footer .fparks { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 2px 0 4p
 footer .fparks a { color: var(--mist-2); text-decoration: none; font: 600 19px/1.2 var(--f-display); }
 footer .fparks a:hover { color: var(--snow); }
 footer .fparks a[aria-current] { color: var(--emerald-hi); }
+/* Cyrillic descenders (р, у) in the big heading must clear the tagline */
+.hero h1 { line-height: 1; padding-bottom: .1em; }
+html[data-phase="day"] .hero .tagline { text-shadow: 0 0 16px rgba(240, 236, 222, .6); }

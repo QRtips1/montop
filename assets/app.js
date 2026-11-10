@@ -197,9 +197,24 @@
     return { retune: retune };
   })();
 
+  /* ---------- peak labels: hide any that would sit on the hero text or on each other ---------- */
+  function declutter() {
+    var obs = [].map.call(document.querySelectorAll(".hero > *"), function (el) { return el.getBoundingClientRect(); }).filter(function (r) { return r.width; });
+    var labels = [].slice.call(document.querySelectorAll(".peak-label")).sort(function (a, b) { return a.classList.contains("minor") - b.classList.contains("minor"); }), kept = [];
+    function hit(r, q, pad) { return r.left < q.right + pad && r.right > q.left - pad && r.top < q.bottom + pad && r.bottom > q.top - pad; }
+    labels.forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (!r.width) return;
+      var bad = obs.some(function (q) { return hit(r, q, 8); }) || kept.some(function (q) { return hit(r, q, 4); });
+      el.style.visibility = bad ? "hidden" : "";
+      if (!bad) kept.push(r);
+    });
+  }
+
   /* ---------- parallax ---------- */
   function parallax() {
     var layers = $$("[data-speed]"), ticking = false;
+    window.addEventListener("resize", declutter);
     function apply() {
       ticking = false;
       var y = Math.min(window.scrollY || 0, window.innerHeight * 3);
@@ -207,8 +222,9 @@
         var k = +layers[i].getAttribute("data-speed");
         layers[i].style.transform = "translate3d(-50%," + (-y * k).toFixed(1) + "px,0)";
       }
+      declutter();
     }
-    if (reduced) return;
+    if (reduced) { declutter(); return; }
     window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }, { passive: true });
     apply();
   }
@@ -573,6 +589,7 @@
   function renderAll() {
     applyStatic(); setSeason(season); renderFilters(); renderTrails(); renderDrives(); renderStay(); renderBiz(); renderKnow(); renderCredits(); renderWeather();
     var mt = $("[data-map-toggle]"); if (mt) mt.textContent = t($("#mapbox").classList.contains("collapsed") ? "map.show" : "map.hide");
+    declutter();
   }
 
   document.documentElement.setAttribute("data-season", season);
