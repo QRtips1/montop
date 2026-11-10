@@ -419,3 +419,4 @@ footer .fparks a[aria-current] { color: var(--emerald-hi); }
 html[data-phase="day"] .hero .tagline { text-shadow: 0 0 16px rgba(240, 236, 222, .6); }
 .brand .logo { align-self: center; width: 34px; height: 34px; flex: none; border-radius: 50%; }
 @media (max-width: 380px) { .brand .logo { width: 30px; height: 30px; } }
+footer .by { font: 500 13px/1 var(--f-data); letter-spacing: .04em; color: var(--mist-3); margin-left: 6px; vertical-align: middle; white-space: nowrap; }
