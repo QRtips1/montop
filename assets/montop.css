@@ -417,3 +417,5 @@ footer .fparks a[aria-current] { color: var(--emerald-hi); }
 /* Cyrillic descenders (р, у) in the big heading must clear the tagline */
 .hero h1 { line-height: 1; padding-bottom: .1em; }
 html[data-phase="day"] .hero .tagline { text-shadow: 0 0 16px rgba(240, 236, 222, .6); }
+.brand .logo { align-self: center; width: 34px; height: 34px; flex: none; border-radius: 50%; }
+@media (max-width: 380px) { .brand .logo { width: 30px; height: 30px; } }
