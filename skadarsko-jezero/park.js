@@ -312,9 +312,9 @@ window.MT_PARK = {
     "ru": "Камыши желтеют, на тропах приятно, людей меньше."
    },
    {
-    "me": "Stižu ptice na zimovanje. Od 15. novembra zimska oprema.",
-    "en": "Birds arrive for the winter. Winter equipment from 15 November.",
-    "ru": "Прилетают птицы на зимовку. С 15 ноября зимняя резина."
+    "me": "Gužve nema, jezero je mirno. Od 15. novembra zimska oprema.",
+    "en": "No crowds, a quiet lake. Winter equipment from 15 November.",
+    "ru": "Толп нет, озеро тихое. С 15 ноября зимняя резина."
    },
    {
     "me": "Tiho jezero i magla u jutrima.",

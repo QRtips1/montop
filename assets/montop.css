@@ -478,3 +478,75 @@ footer .fparks a { display: inline-flex; align-items: center; min-height: 40px; 
 .wx-temp, .nowstrip .t { font-variant-numeric: normal; }
 #particles { transition: opacity .3s linear; }
 @media (prefers-reduced-motion: reduce) { .stage img, .stage img.on { transition: opacity .3s; transform: none; } .pk { transition: none; } }
+/* real panoramas: wider than the screen at a fixed degrees-per-screen scale; phones centre one azimuth,
+   desktops put another one right of the hero text */
+.layer.pano { --u: calc(max(100vw, 175vh) / var(--base)); --lh: calc(var(--u) * var(--R) / 2.4); width: calc(var(--u) * var(--R)); left: calc(50% + var(--dm) * var(--u)); }
+@media (min-width: 900px) { .layer.pano { left: calc(68% + var(--dd) * var(--u)); } }
+.layer svg { position: relative; z-index: 1; }
+.peak-label { z-index: 2; }
+/* phones: title and buttons on top, live weather at the bottom, the real peaks in between */
+@media (max-width: 640px) { .hero .nowstrip { margin-top: auto; } .hero { padding-bottom: 20px; } }
+@media (max-width: 640px) { .layer.pano { margin-top: var(--ms, 10vh); } }
+
+/* ---------- live sky (2026-11-13): weights come from the real sun altitude and weather in the park ---------- */
+.sky-x { position: absolute; inset: 0; opacity: 0; transition: opacity 2s linear; }
+.sky-over { background: linear-gradient(180deg, #8f99a3 0%, #b3b9be 48%, #c9cac6 74%); opacity: var(--w-over, 0); }
+.sky-dawn { background: linear-gradient(180deg, #3d4b78 0%, #8a7aa9 34%, #e9a3a3 58%, #ffd2a3 74%); opacity: var(--w-dawn, 0); }
+.sky-dusk { background: linear-gradient(180deg, #27365c 0%, #7c5877 30%, #df7a5a 56%, #f8b35f 72%); opacity: var(--w-dusk, 0); }
+.sky-blue { background: linear-gradient(180deg, #101d3d 0%, #26396c 40%, #4f67a3 66%, #9a8fb3 82%); opacity: var(--w-blue, 0); }
+.sky-night { background: linear-gradient(180deg, #070d1d 0%, #0f1b35 45%, #1c2c4e 72%, #2b3d63 88%); opacity: var(--w-night, 0); }
+.sky-storm { background: linear-gradient(180deg, #333a43 0%, #4f5761 50%, #6b7278 76%); opacity: var(--w-storm, 0); }
+html[data-phase] .sky-night { opacity: var(--w-night, 0); }
+html[data-phase] .sky-dusk { opacity: var(--w-dusk, 0); }
+html[data-phase] .layer, html[data-phase] .fog { filter: none; }
+html[data-phase] .fog { filter: blur(8px); }
+.sun { left: var(--sun-x, 68%); top: var(--sun-y, 18%); opacity: var(--sun-glow, 1); transition: opacity 2s linear; }
+html[data-phase="night"] .sun { opacity: 0; }
+.orb.sun-orb { position: absolute; z-index: 0; width: 1.6%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); display: none;
+  background: radial-gradient(circle, var(--sun-core, #fff8e4) 0 58%, rgba(255, 255, 255, 0) 72%); box-shadow: 0 0 40px 14px rgba(var(--glow), .45); }
+html[data-sun="1"] .orb.sun-orb { display: block; }
+.tint { position: absolute; inset: 0; pointer-events: none; background: var(--tint, #fff); mix-blend-mode: multiply; transition: background-color 2s linear; }
+.moon { left: var(--moon-x, 76%); top: var(--moon-y, 15%); width: 5.2vmin; height: 5.2vmin; transform: translate(-50%, -50%); background: none; box-shadow: none; opacity: 0; }
+html[data-moon="1"] .moon { opacity: var(--moon-op, .95); }
+html[data-phase="night"] .moon { opacity: 0; }
+html[data-phase="night"][data-moon="1"] .moon { opacity: var(--moon-op, .95); }
+.moon svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 10px rgba(235, 238, 255, .55)); }
+.moon .m-dark { fill: rgba(40, 52, 80, .55); }
+.moon .m-lit { fill: #f4f1e2; }
+.clouds { position: absolute; left: -25%; width: 150%; top: 2vh; height: 52vh; pointer-events: none; opacity: var(--w-cloud, 0); transition: opacity 3s linear;
+  filter: blur(7px) brightness(var(--cloud-b, 1)); animation: clouddrift var(--cloud-dur, 240s) linear infinite alternate; will-change: transform;
+  background:
+    radial-gradient(24% 13% at 12% 30%, rgba(255, 255, 255, .95), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(18% 10% at 20% 26%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(30% 14% at 44% 18%, rgba(250, 250, 252, .92), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(20% 11% at 52% 24%, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(26% 12% at 76% 34%, rgba(248, 249, 251, .9), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(16% 9% at 88% 28%, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0) 70%); }
+.clouds.c2 { top: 14vh; height: 40vh; opacity: calc(var(--w-cloud, 0) * .85); animation-duration: calc(var(--cloud-dur, 240s) * 1.4); animation-direction: alternate-reverse;
+  background:
+    radial-gradient(28% 12% at 6% 50%, rgba(236, 239, 243, .9), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(22% 10% at 32% 44%, rgba(242, 244, 247, .9), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(30% 13% at 60% 52%, rgba(236, 239, 243, .92), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(24% 11% at 90% 46%, rgba(242, 244, 247, .88), rgba(255, 255, 255, 0) 70%); }
+@keyframes clouddrift { from { transform: translateX(-6%); } to { transform: translateX(6%); } }
+.flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+  background: radial-gradient(ellipse 60% 55% at var(--fx, 50%) 18%, rgba(232, 238, 255, .9), rgba(200, 212, 255, .3) 45%, rgba(200, 212, 255, 0) 78%); }
+.bolt { position: absolute; left: 0; top: 0; width: 100%; height: 62%; pointer-events: none; opacity: 0; }
+.bolt path { fill: none; stroke: #eef2ff; stroke-width: .35; stroke-linejoin: round; filter: drop-shadow(0 0 2px #c9d6ff); vector-effect: non-scaling-stroke; }
+.bolt path { stroke-width: 2px; }
+@media (prefers-reduced-motion: reduce) { .clouds { animation: none; } .flash, .bolt { display: none; } }
+/* dark sky by day (storm, heavy rain): light hero text */
+html[data-ink="light"] .hero h1 { color: var(--snow); text-shadow: 0 2px 30px rgba(0, 0, 0, .4); }
+html[data-ink="light"] .hero .tagline { color: var(--mist); text-shadow: none; }
+html[data-ink="light"] .peak-label, html[data-phase="dusk"] .peak-label, html[data-phase="dawn"] .peak-label { color: rgba(240, 244, 242, .78); }
+
+/* what to look out for now: seasonal facts for this month in the park */
+.nature { margin-top: 26px; }
+.nature h3 { margin: 0 0 12px; font: 500 22px/1.2 var(--f-display); color: var(--snow); display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.nature h3 .m { font: 600 14px/1 var(--f-data); color: var(--resin); }
+.nature-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.nfact { padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 8px; }
+.nfact p { margin: 0; color: var(--mist); font-size: 15.5px; line-height: 1.55; }
+.nfact .ntag { align-self: flex-start; font: 600 12px/1 var(--f-data); color: var(--emerald); background: rgba(255, 255, 255, .05); border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px; }
+.nfact .nsrc { margin-top: auto; padding-top: 6px; font-size: 13px; color: var(--mist-3); }
+.nfact .nsrc a { color: var(--mist-2); text-decoration: underline; text-underline-offset: 2px; }

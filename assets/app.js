@@ -39,33 +39,147 @@
 
   /* ---------- season & time ---------- */
   var now = new Date();
-  var curSeason = S.byMonth[now.getMonth()];
+  var PARK = document.documentElement.getAttribute("data-park");
+  /* month in Montenegro (park time), not on the visitor's clock */
+  var PM = (function () { try { return +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Podgorica", month: "numeric" }).format(now) - 1; } catch (e) { return now.getMonth(); } })();
+  var curSeason = S.byMonth[PM];
   var season = curSeason;
   var weather = null;
 
-  function sunAlt(date, lat, lon) {
-    var rad = Math.PI / 180, d = (date.getTime() - Date.UTC(2000, 0, 1, 12)) / 864e5;
-    var g = (357.529 + 0.98560028 * d) % 360, q = (280.459 + 0.98564736 * d) % 360;
-    var Lm = q + 1.915 * Math.sin(g * rad) + 0.02 * Math.sin(2 * g * rad), e = 23.439 - 0.00000036 * d;
-    var RA = Math.atan2(Math.cos(e * rad) * Math.sin(Lm * rad), Math.cos(Lm * rad)) / rad;
-    var dec = Math.asin(Math.sin(e * rad) * Math.sin(Lm * rad)) / rad;
-    var GMST = (18.697374558 + 24.06570982441908 * d) % 24, H = GMST * 15 + lon - RA;
-    return Math.asin(Math.sin(lat * rad) * Math.sin(dec * rad) + Math.cos(lat * rad) * Math.cos(dec * rad) * Math.cos(H * rad)) / rad;
+  /* ---------- live sky ----------
+     Sun and moon positions follow suncalc (V. Agafonkin, BSD): computed from UTC for the park's own
+     coordinates, so the light is the park's, whatever the visitor's clock says. */
+  var VIEW = (function () { try { return JSON.parse($(".scene").getAttribute("data-view") || "{}"); } catch (e) { return {}; } })();
+  var SKYLAT = VIEW.lat || ZAB.lat, SKYLON = VIEW.lon || ZAB.lon;
+  var rad = Math.PI / 180, OBL = rad * 23.4397;
+  function toDays(d) { return d.valueOf() / 864e5 - 0.5 + 2440588 - 2451545; }
+  function ra(l, b) { return Math.atan2(Math.sin(l) * Math.cos(OBL) - Math.tan(b) * Math.sin(OBL), Math.cos(l)); }
+  function dec(l, b) { return Math.asin(Math.sin(b) * Math.cos(OBL) + Math.cos(b) * Math.sin(OBL) * Math.sin(l)); }
+  function azim(H, phi, d) { return Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(d) * Math.cos(phi)); }
+  function alti(H, phi, d) { return Math.asin(Math.sin(phi) * Math.sin(d) + Math.cos(phi) * Math.cos(d) * Math.cos(H)); }
+  function sidereal(d, lw) { return rad * (280.16 + 360.9856235 * d) - lw; }
+  function sunCoords(d) {
+    var M = rad * (357.5291 + 0.98560028 * d), C = rad * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M));
+    var L = M + C + rad * 102.9372 + Math.PI; return { dec: dec(L, 0), ra: ra(L, 0) };
   }
-  function localHour(date) {
-    try { return +new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hour12: false, timeZone: "Europe/Podgorica" }).format(date); }
-    catch (e) { return date.getHours(); }
+  function moonCoords(d) {
+    var L = rad * (218.316 + 13.176396 * d), M = rad * (134.963 + 13.064993 * d), F = rad * (93.272 + 13.229350 * d);
+    var l = L + rad * 6.289 * Math.sin(M), b = rad * 5.128 * Math.sin(F);
+    return { ra: ra(l, b), dec: dec(l, b), dist: 385001 - 20905 * Math.cos(M) };
+  }
+  function bodyPos(c, date) {  // compass azimuth (0 = north) and altitude, degrees
+    var lw = rad * -SKYLON, phi = rad * SKYLAT, H = sidereal(toDays(date), lw) - c.ra;
+    return { az: (azim(H, phi, c.dec) / rad + 180) % 360, alt: alti(H, phi, c.dec) / rad };
+  }
+  function sunAlt(date) { return bodyPos(sunCoords(toDays(date)), date).alt; }
+  function moonIllum(date) {
+    var d = toDays(date), s = sunCoords(d), m = moonCoords(d), sd = 149598000;
+    var phi = Math.acos(Math.sin(s.dec) * Math.sin(m.dec) + Math.cos(s.dec) * Math.cos(m.dec) * Math.cos(s.ra - m.ra));
+    var inc = Math.atan2(sd * Math.sin(phi), m.dist - sd * Math.cos(phi));
+    var ang = Math.atan2(Math.cos(s.dec) * Math.sin(s.ra - m.ra), Math.sin(s.dec) * Math.cos(m.dec) - Math.cos(s.dec) * Math.sin(m.dec) * Math.cos(s.ra - m.ra));
+    return { frac: (1 + Math.cos(inc)) / 2, waxing: ang < 0 };
+  }
+  function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function skylineAt(az) {  // elevation angle of the real ridge in this direction
+    if (!VIEW.sky || az < VIEW.az0 || az > VIEW.az1) return null;
+    return VIEW.sky[Math.round((az - VIEW.az0) * 2)];
   }
   var MODES = ["auto", "day", "night"];
   var mode = MODES.indexOf(store.get("mt-mode")) > -1 ? store.get("mt-mode") : "auto";
+  var light = { sun: 30, wNight: 0, cloud: 0 };
+  function wxNow() { return (season === curSeason && weather && weather.current) ? weather.current : null; }
   function setPhase() {
-    var d = new Date(), a = sunAlt(d, ZAB.lat, ZAB.lon), ph = "day";
-    if (a < -6) ph = "night"; else if (a < 5) ph = localHour(d) < 12 ? "dawn" : "dusk";
-    if (mode === "day") ph = "day"; else if (mode === "night") ph = "night";
-    document.documentElement.setAttribute("data-phase", ph);
-    document.documentElement.setAttribute("data-mode", mode);
+    var d = new Date(), root = document.documentElement, st = root.style;
+    var sp = bodyPos(sunCoords(toDays(d)), d), mp = bodyPos(moonCoords(toDays(d)), d), mi = moonIllum(d);
+    var a = mode === "day" ? 35 : mode === "night" ? -20 : sp.alt, evening = mode === "auto" ? sp.az > 180 : true;
+    var c = wxNow(), cc = c ? c.cloud_cover : 25, code = c ? c.weather_code : 1, kind = c ? wKind(code) : "dry";
+    var storm = c && code >= 95 ? 1 : 0, wet = kind === "rain" || kind === "snow" ? 1 : 0;
+    var over = clamp01((cc - 55) / 45) * (wet ? 1 : .85);
+    var wNight = clamp01((-3 - a) / 9), wBlue = clamp01(1 - Math.abs(a + 4.5) / 5) * (1 - wNight * .7);
+    var wGlow = clamp01(1 - Math.abs(a - 1.5) / 6.5) * (1 - over * .75), wGold = clamp01(1 - Math.abs(a - 8) / 7) * (1 - over * .8);
+    var moonUp = mp.alt > 0 && mode !== "day", moonLight = moonUp ? mi.frac * clamp01(mp.alt / 10) : 0;
+    st.setProperty("--w-night", (wNight * (1 - moonLight * .18)).toFixed(3));
+    st.setProperty("--w-blue", (wBlue * .95).toFixed(3));
+    st.setProperty("--w-dawn", (evening ? 0 : wGlow * .9).toFixed(3));
+    st.setProperty("--w-dusk", (evening ? wGlow * .9 : 0).toFixed(3));
+    st.setProperty("--w-over", (over * (1 - wNight * .8) * .9).toFixed(3));
+    st.setProperty("--w-storm", (storm * .75 * (1 - wNight * .7)).toFixed(3));
+    st.setProperty("--w-cloud", (clamp01((cc - 15) / 70) * .95).toFixed(3));
+    st.setProperty("--cloud-b", (wet ? .78 : 1) * (storm ? .8 : 1) + "");
+    st.setProperty("--cloud-dur", Math.round(320 - Math.min(260, (c ? c.wind_speed_10m : 10) * 6)) + "s");
+    // one multiply tint over the landscape: night blue, blue hour, warm glow, golden hour, dull overcast, storm
+    var tint = [1, 1, 1];
+    function mul(rgb, w) { for (var i = 0; i < 3; i++) tint[i] *= 1 - w + w * rgb[i] / 255; }
+    mul([52, 70, 118], wNight * (.62 - moonLight * .14));
+    mul([96, 110, 168], wBlue * .45);
+    mul(evening ? [255, 150, 98] : [255, 178, 160], wGlow * .38);
+    mul([255, 214, 160], wGold * .3);
+    mul([150, 158, 166], over * .3);
+    mul([92, 100, 112], storm * .32);
+    st.setProperty("--tint", "rgb(" + tint.map(function (v) { return Math.round(v * 255); }).join(",") + ")");
+    // the sun: a disc on the far ridge layer, so it really sets behind the mountains; its glow follows it
+    var sunVis = mode === "auto" && sp.alt > -1.5 && sp.az > VIEW.az0 && sp.az < VIEW.az1 && cc < 88 && !wet;
+    var orb = $(".sun-orb");
+    if (orb && VIEW.az0 != null) {
+      var ux = VIEW.W / (VIEW.az1 - VIEW.az0);
+      orb.style.left = ((sp.az - VIEW.az0) / (VIEW.az1 - VIEW.az0) * 100).toFixed(2) + "%";
+      orb.style.top = ((VIEW.hor - Math.max(-2, a) * ux * VIEW.ex) / VIEW.H * 100).toFixed(2) + "%";
+    }
+    root.setAttribute("data-sun", sunVis ? "1" : "0");
+    var low = clamp01(1 - (a - 2) / 14);
+    st.setProperty("--sun-core", a < 4 ? "#ffb070" : a < 12 ? "#ffe2a6" : "#fff8e4");
+    st.setProperty("--glow", a < 4 ? "255, 150, 90" : a < 12 ? "255, 205, 130" : "255, 240, 205");
+    st.setProperty("--sun-glow", ((mode === "night" ? 0 : 1) * (1 - over * .7) * (a < -6 ? 0 : 1)).toFixed(2));
+    st.setProperty("--glow-op", (.35 + .3 * low).toFixed(2));
+    // the moon: its real position and phase; shown only above the real ridge line
+    var ridge = skylineAt(mp.az), mx = null;
+    var moonVis = moonUp && mode === "auto" && ridge != null && mp.alt > ridge + .4 && cc < 85 && !wet;
+    if (mode === "night") { moonVis = true; }
+    root.setAttribute("data-moon", moonVis ? "1" : "0");
+    if (moonVis) {
+      var r = 1, k = Math.cos(Math.PI * mi.frac), lit = $(".moon .m-lit");  // terminator ellipse
+      var f = mi.frac, sweepOuter = mi.waxing ? 1 : 0, rx = Math.abs(1 - 2 * f), sweepIn = (f > .5) === mi.waxing ? 1 : 0;
+      if (lit) lit.setAttribute("d", "M0,-1 A1,1 0 0," + sweepOuter + " 0,1 A" + rx.toFixed(3) + ",1 0 0," + (sweepIn ? 1 : 0) + " 0,-1 Z");
+      st.setProperty("--moon-op", (a > 0 ? .45 : .95).toFixed(2));
+      mx = mode === "night" ? null : mp;
+    }
+    light = { sun: a, sunAz: sp.az, moon: mx, wNight: wNight, cloud: cc, storm: storm };
+    placeSky();
+    var ph = a < -6 ? "night" : a < 4 ? (evening ? "dusk" : "dawn") : "day";
+    root.setAttribute("data-phase", ph);
+    root.setAttribute("data-ink", ph === "day" && (storm || (wet && over > .8)) ? "light" : "");
+    root.setAttribute("data-mode", mode);
     var mb = $("#mode-name"); if (mb) mb.textContent = t("mode." + mode);
     particles.retune();
+    lightning(storm && mode !== "night");
+  }
+  // screen positions that depend on the far layer: the sun glow and the moon
+  function placeSky() {
+    var far = $(".l-far"), st = document.documentElement.style;
+    if (!far || VIEW.az0 == null) return;
+    var r = far.getBoundingClientRect(), R = VIEW.az1 - VIEW.az0, ux = VIEW.W / R;
+    function at(az, alt) { return [r.left + (az - VIEW.az0) / R * r.width, r.top + (VIEW.hor - alt * ux * VIEW.ex) / VIEW.H * r.width / (VIEW.W / VIEW.H)]; }
+    var s = at(Math.max(VIEW.az0 - 25, Math.min(VIEW.az1 + 25, light.sunAz || 200)), Math.max(-3, light.sun));
+    st.setProperty("--sun-x", Math.round(s[0]) + "px"); st.setProperty("--sun-y", Math.round(s[1]) + "px");
+    if (light.moon) { var m = at(light.moon.az, light.moon.alt); st.setProperty("--moon-x", Math.round(m[0]) + "px"); st.setProperty("--moon-y", Math.round(m[1]) + "px"); }
+    else { st.removeProperty("--moon-x"); st.removeProperty("--moon-y"); }
+  }
+  // thunderstorm: a soft, rare flash and a thin far bolt; never on reduced motion
+  var boltT = 0;
+  function lightning(on) {
+    clearTimeout(boltT);
+    if (!on || reduced) return;
+    boltT = setTimeout(function strike() {
+      if (!document.hidden) {
+        var fl = $(".flash"), bo = $(".bolt"), x = 15 + Math.random() * 70, y = 4, pts = [];
+        document.documentElement.style.setProperty("--fx", x + "%");
+        for (var i = 0; i < 9; i++) { pts.push((x + (Math.random() - .5) * 6 * (i ? 1 : 0)).toFixed(1) + "," + y.toFixed(1)); x += (Math.random() - .5) * 5; y += 6 + Math.random() * 6; }
+        $(".bolt path").setAttribute("d", "M" + pts.join(" L"));
+        var k = [{ opacity: 0 }, { opacity: .2, offset: .08 }, { opacity: .04, offset: .25 }, { opacity: .14, offset: .4 }, { opacity: 0 }];
+        if (fl.animate) { fl.animate(k, { duration: 700, easing: "ease-out" }); if (Math.random() < .6) bo.animate([{ opacity: 0 }, { opacity: .55, offset: .08 }, { opacity: 0, offset: .3 }, { opacity: .35, offset: .42 }, { opacity: 0 }], { duration: 700 }); }
+      }
+      boltT = setTimeout(strike, 7000 + Math.random() * 14000);
+    }, 2500 + Math.random() * 5000);
   }
 
   /* ---------- weather ---------- */
@@ -98,7 +212,7 @@
       var c = j.current || {};
       document.documentElement.setAttribute("data-fog", wKind(c.weather_code) === "fog" ? "1" : "0");
       document.documentElement.setAttribute("data-cloud", (c.cloud_cover > 80 || [3, 45, 48].indexOf(c.weather_code) > -1) ? "1" : "0");
-      renderWeather(); particles.retune(); declutter();
+      renderWeather(); setPhase(); declutter();
     }).catch(function () { weather = false; renderWeather(); });
   }
   function renderWeather() {
@@ -201,7 +315,8 @@
 
   /* ---------- peak labels: hide any that would sit on the hero text or on each other ---------- */
   function declutter() {
-    var obs = [].map.call(document.querySelectorAll(".hero > *"), function (el) { return el.getBoundingClientRect(); }).filter(function (r) { return r.width; });
+    // the area actually covered by hero text and buttons (a block h1 spans the full width, its text does not)
+    var obs = [].map.call(document.querySelectorAll(".hero > *"), function (el) { var rg = document.createRange(); rg.selectNodeContents(el); return rg.getBoundingClientRect(); }).filter(function (r) { return r.width; });
     var labels = [].slice.call(document.querySelectorAll(".peak-label")).sort(function (a, b) { return a.classList.contains("minor") - b.classList.contains("minor"); }), kept = [];
     function hit(r, q, pad) { return r.left < q.right + pad && r.right > q.left - pad && r.top < q.bottom + pad && r.bottom > q.top - pad; }
     labels.forEach(function (el) {
@@ -221,6 +336,7 @@
     function apply() {
       ticking = false;
       var y = Math.min(window.scrollY || 0, window.innerHeight * 3);
+      placeSky();
       // weather particles belong to the hero; keep only a trace over the content
       if (pc) pc.style.opacity = Math.max(0.15, 1 - y / (window.innerHeight * 0.8)).toFixed(2);
       for (var i = 0; i < layers.length; i++) {
@@ -274,7 +390,7 @@
   function drive(id) { for (var i = 0; i < D.drives.length; i++) if (D.drives[i].id === id) return D.drives[i]; }
   function diffHtml(d) { var b = ""; for (var i = 1; i <= 4; i++) b += '<b class="' + (i <= d ? "on" : "") + '"></b>'; return '<span class="diff d' + d + '"><i>' + b + "</i>" + esc(t("d" + d)) + "</span>"; }
   function monthsHtml(m) {
-    var cur = now.getMonth(), s = '<div class="months" aria-hidden="true">';
+    var cur = PM, s = '<div class="months" aria-hidden="true">';
     for (var i = 0; i < 12; i++) s += '<span class="m' + m[i] + (i === cur ? " now" : "") + '"></span>';
     s += '</div><div class="months-l" aria-hidden="true">';
     for (var j = 0; j < 12; j++) s += "<span>" + esc(t("months")[j]) + "</span>";
@@ -320,8 +436,24 @@
     $("#season-tabs").innerHTML = S.order.map(function (s) {
       return '<button type="button" data-season="' + s + '" aria-pressed="' + (s === season) + '">' + esc(t("season." + s)) + (s === curSeason ? '<span class="cur">' + esc(t("season.now")) + "</span>" : "") + "</button>";
     }).join("");
-    var m = now.getMonth();
+    var m = PM;
     $("#month-note").innerHTML = '<span class="m">' + esc(t("monthsLong")[m]) + "</span>" + esc(L(S.month[m]));
+  }
+  /* "what to look out for now": facts for the current month in the park, each with its source */
+  function renderNature() {
+    var N = window.MT_NATURE, box = $("#nature");
+    if (!N || !box || !N.parks[PARK]) return;
+    var all = N.parks[PARK], mo = PM + 1;
+    var list = all.filter(function (f) { return f.m && f.m.indexOf(mo) >= 0; });
+    all.forEach(function (f) { if (!f.m && list.length < 2) list.push(f); });
+    list = list.slice(0, 3);
+    if (!list.length) { box.hidden = true; return; }
+    $("#nature-m").textContent = t("monthsLong")[PM];
+    $("#nature-list").innerHTML = list.map(function (f) {
+      var src = f.src.map(function (k) { var o = N.src[k]; return '<a href="' + esc(o.u) + '" target="_blank" rel="noopener">' + esc(o.n) + "</a>"; }).join(", ");
+      return '<div class="nfact panel"><span class="ntag">' + esc(L(N.tags[f.tag])) + "</span><p>" + esc(L(f.t)) + '</p><span class="nsrc">' + esc(t(f.src.length > 1 ? "nature.srcs" : "nature.src")) + ": " + src + "</span></div>";
+    }).join("");
+    box.hidden = false;
   }
   function renderPicks() {
     $("#picks").innerHTML = S.picks[season].map(function (p) {
@@ -339,7 +471,7 @@
     if (filter === "easy") return h.diff <= 1;
     if (filter === "mid") return h.diff === 2 || h.diff === 3;
     if (filter === "hard") return h.diff >= 4;
-    if (filter === "now") return h.months[now.getMonth()] === 2;
+    if (filter === "now") return h.months[PM] === 2;
     if (filter === "kids") return h.kids;
     return true;
   }
@@ -349,7 +481,7 @@
     }).join("");
   }
   function renderTrails() {
-    var m = now.getMonth();
+    var m = PM;
     var list = D.hikes.filter(passes);
     $("#trail-list").innerHTML = list.map(function (h) {
       var p = photo(h.id), state = h.months[m] === 2 ? '<span class="badge-now">' + esc(t("r.goodnow")) + "</span>" : h.months[m] === 0 ? '<span class="badge-off">' + esc(t("r.notnow")) + "</span>" : "";
@@ -425,7 +557,7 @@
   }
   function openSheet(id) {
     var h = hike(id); if (!h) return;
-    var p = photo(h.id), m = now.getMonth();
+    var p = photo(h.id), m = PM;
     var coords = h.start[0].toFixed(5) + ", " + h.start[1].toFixed(5);
     $("#sheet-pane").innerHTML =
       '<button class="close" type="button" aria-label="Close" data-close>×</button>' +
@@ -471,7 +603,7 @@
   var curDrive = D.drives[0].id, dmap = null, dLayer = null;
   function renderDrives() {
     $("#drive-tabs").innerHTML = D.drives.map(function (d) { return '<button type="button" class="chip" data-d="' + d.id + '" aria-pressed="' + (d.id === curDrive) + '">' + esc(L(d.name)) + "</button>"; }).join("");
-    var d = drive(curDrive), m = now.getMonth();
+    var d = drive(curDrive), m = PM;
     var stat = [];
     if (d.km) stat.push("<span>" + d.km + " " + t("roads.km") + (d.oneway ? " <small>" + esc(t("u.oneway")) + "</small>" : "") + "</span>");
     if (d.hours) stat.push("<span>" + esc(L(d.hours)) + "</span>");
@@ -597,13 +729,14 @@
   }
 
   function renderAll() {
-    applyStatic(); setSeason(season); renderFilters(); renderTrails(); renderDrives(); renderStay(); renderBiz(); renderKnow(); renderCredits(); renderWeather();
+    applyStatic(); setSeason(season); renderNature(); renderFilters(); renderTrails(); renderDrives(); renderStay(); renderBiz(); renderKnow(); renderCredits(); renderWeather();
     var mt = $("[data-map-toggle]"); if (mt) mt.textContent = t($("#mapbox").classList.contains("collapsed") ? "map.show" : "map.hide");
     declutter();
   }
 
   document.documentElement.setAttribute("data-season", season);
-  setPhase(); setInterval(setPhase, 5 * 60 * 1000);
+  setPhase(); setInterval(setPhase, 60 * 1000);
+  window.addEventListener("resize", placeSky);
   if (window.innerWidth <= 900) $("#mapbox").classList.add("collapsed");
   renderAll(); bind(); parallax(); initForm(); fetchWeather(); route();
 })();
