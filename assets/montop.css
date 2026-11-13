@@ -1,4 +1,4 @@
-/* MonTop — Durmitor.
+/* MonTop: national park guides.
    Layout: a fixed mountain scene (sky, real-peak skyline layers, fog, forest) sits behind everything;
    content floats over it in one 1180px column on translucent bark/pine panels. Single dark world. */
 :root {
@@ -8,11 +8,11 @@
   --resin: #e2ad62; --resin-hi: #f1c886;
   --mist: #e8efea; --mist-2: #c3d1c9; --mist-3: #8fa398;
   --snow: #f7f9f8; --knafelc: #cc3a30;
-  --panel: rgba(12, 26, 19, .72); --panel-solid: #0f241a; --panel-bark: rgba(31, 20, 12, .78);
+  --panel: rgba(12, 26, 19, .86); --panel-solid: #0f241a; --panel-bark: rgba(31, 20, 12, .9);
   --line: rgba(232, 239, 234, .14); --line-2: rgba(232, 239, 234, .26);
-  --f-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --f-display: "Alegreya", Georgia, "Times New Roman", serif;
   --f-body: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --f-data: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --f-data: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --r: 14px; --r-sm: 9px;
   --gutter: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
@@ -420,3 +420,61 @@ html[data-phase="day"] .hero .tagline { text-shadow: 0 0 16px rgba(240, 236, 222
 .brand .logo { align-self: center; width: 34px; height: 34px; flex: none; border-radius: 50%; }
 @media (max-width: 380px) { .brand .logo { width: 30px; height: 30px; } }
 footer .by { font: 500 13px/1 var(--f-data); letter-spacing: .04em; color: var(--mist-3); margin-left: 6px; vertical-align: middle; white-space: nowrap; }
+
+/* ---------- 2026-11-13 refresh: calmer solid surfaces, no caps labels, bigger tap targets ---------- */
+::selection { background: rgba(226, 173, 98, .38); color: var(--snow); }
+input, textarea, select { accent-color: var(--resin); caret-color: var(--resin); }
+button, .btn, .pill, select { touch-action: manipulation; }
+.topbar { background: rgba(8, 20, 14, .94); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.panel, .btn.ghost, .nowstrip, .season-tabs button, .hero .indep, .sheet .scrim { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.btn.ghost { background: rgba(8, 20, 14, .62); }
+.nowstrip { background: rgba(8, 20, 14, .8); }
+.hero .indep { background: rgba(8, 20, 14, .72); }
+.season-tabs button { background: rgba(8, 20, 14, .72); }
+.nowstrip .dot { animation: none; box-shadow: none; }
+h1, h2, h3 { font-weight: 700; letter-spacing: -.01em; }
+h2 { font-size: clamp(32px, 4.4vw, 50px); }
+.hero h1 { font-size: clamp(54px, 9.6vw, 140px); line-height: 1; letter-spacing: -.015em; margin-top: 0; padding-bottom: .08em; }
+.hero .tagline { font: 400 clamp(18px, 1.9vw, 22px)/1.45 var(--f-body); max-width: 36ch; margin: 6px 0 24px; }
+.brand .word { font-weight: 800; }
+.brand .reg { text-transform: none; letter-spacing: .01em; font-size: 13px; }
+.season-tabs .cur, .month-note .m, .pick .ph .k, .diff, .badge-now, .badge-off, .sheet h4, .example, .scroll-cue, .tags span { text-transform: none; letter-spacing: 0; }
+.season-tabs .cur { font-size: 12px; }
+.month-note .m { font-size: 14px; font-weight: 600; }
+.pick .ph .k { font-size: 12px; padding: 5px 8px; }
+.diff { font-size: 13px; }
+.badge-now, .badge-off { font-size: 12px; }
+.sheet h4 { font-size: 15px; font-weight: 600; }
+.example { font-size: 12px; }
+.scroll-cue { font-size: 14px; }
+.tags span { font-size: 12px; }
+.wx-temp { font-weight: 600; letter-spacing: -.03em; }
+.wx-cond { font: 500 22px/1.15 var(--f-body); }
+.peak-label { font-size: 12px; }
+.months-l { font-size: 12px; margin-top: 5px; }
+.stats, .wx-facts b, .wx-days b, .bigstats b, .coords, .nowstrip .t, .wx-temp { font-variant-numeric: tabular-nums; }
+/* Good to know: an info board, value on the left, what it means on the right */
+.know { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+@media (max-width: 700px) { .know { grid-template-columns: minmax(0, 1fr); } }
+.know div { background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 14px 0; display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 18px; align-items: baseline; }
+.know b { font: 700 25px/1.1 var(--f-display); }
+.know span { font-size: 15px; }
+/* tap targets; phones get one language picker instead of three small buttons */
+.pill { min-height: 40px; padding: 8px 13px; }
+.langs button { min-height: 38px; padding: 8px 11px; font-size: 13px; }
+.lang-sel { display: none; }
+@media (max-width: 640px) {
+  .pill { min-height: 44px; min-width: 44px; justify-content: center; }
+  .langs { display: none; }
+  .lang-sel { display: block; -webkit-appearance: none; appearance: none; min-height: 44px; padding: 0 30px 0 13px; border-radius: 999px; border: 1px solid var(--line-2);
+    background: rgba(255, 255, 255, .04) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23c3d1c9' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 11px center / 10px;
+    color: var(--mist); font: 600 14px var(--f-body); }
+  .lang-sel option { color: #111; }
+}
+@media (max-width: 420px) { .pill[data-season-cycle] span { display: none; } }
+footer .fparks a { display: inline-flex; align-items: center; min-height: 40px; }
+.hero .indep a, .src a { padding: 4px 0; }
+.areas { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.wx-temp, .nowstrip .t { font-variant-numeric: normal; }
+#particles { transition: opacity .3s linear; }
+@media (prefers-reduced-motion: reduce) { .stage img, .stage img.on { transition: opacity .3s; transform: none; } .pk { transition: none; } }

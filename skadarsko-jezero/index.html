@@ -11,7 +11,9 @@
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://montop.me/skadarsko-jezero/">
 <meta property="og:url" content="https://montop.me/skadarsko-jezero/">
-<meta property="og:image" content="https://montop.me/assets/hub/skadar-summer.jpg">
+<meta property="og:image" content="https://montop.me/assets/og/skadar.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 
 
@@ -20,9 +22,9 @@
 <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;500;600&family=Onest:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Onest:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
-<link rel="stylesheet" href="../assets/montop.css?v=202611101108">
+<link rel="stylesheet" href="../assets/montop.css?v=202611130705">
 <style>html[data-park="skadar"] { --sky-1: #8eb2c4; --sky-2: #d8d2b8; --sky-3: #efd8a8; --far-1: #b2b8bb; --far-2: #7e8a8f; --mid-1: #8d9584; --mid-2: #5f6b58; --near-1: #7d7950; --near-2: #4a4b30; --water-1: #6d8f8a; --water-2: #34544f; --shine: #fdf3d6; --lily: #5f7a3c; --flower: #f7f4ec; --reed: #8a6d3b; --ff: #20301f; --fb: #2a3a26; } html[data-park="skadar"][data-season="winter"] { --sky-1: #a7c0cf; --sky-2: #dfe5e6; --sky-3: #f2efe6; --far-1: #eef1f2; --far-2: #9aa6ad; --mid-1: #a1a79e; --mid-2: #6c7569; --near-1: #7d7a62; --near-2: #4b4a39; --water-1: #7e979a; --water-2: #3e5659; --shine: #ffffff; --lily: #6e6a45; --flower: rgba(0,0,0,0); --reed: #a28e63; } html[data-park="skadar"][data-season="spring"] { --sky-1: #79b0d6; --sky-2: #c8e0e8; --sky-3: #eef1df; --far-1: #bfc8ca; --far-2: #7f8e90; --mid-1: #87a07c; --mid-2: #4f6a4b; --near-1: #7aa25e; --near-2: #3e5f36; --water-1: #4e9095; --water-2: #22555a; --lily: #4f8a3a; --flower: #ffffff; --reed: #6f8a3e; } html[data-park="skadar"][data-season="summer"] { --sky-1: #4a8dc6; --sky-2: #9cc9e2; --sky-3: #e2f1ef; --far-1: #b8c2c4; --far-2: #7c8a8c; --mid-1: #7e9672; --mid-2: #4b6446; --near-1: #6b9550; --near-2: #365a30; --water-1: #3c8c90; --water-2: #1b5658; --shine: #ffffff; --lily: #3f8a3a; --flower: #fffaf2; --reed: #5f7d34; } </style>
 </head>
 <body>
@@ -43,7 +45,7 @@
 
 <header class="topbar">
   <div class="in">
-    <a class="brand" href="../" aria-label="MonTop"><img class="logo" src="../assets/brand/logo-64.png" width="34" height="34" alt=""><span class="word">Mon<i>Top</i></span><span class="reg">Skadar</span></a>
+    <a class="brand" href="../" aria-label="MonTop" translate="no"><img class="logo" src="../assets/brand/logo-64.png" width="34" height="34" alt=""><span class="word">Mon<i>Top</i></span><span class="reg">Skadar</span></a>
     <nav class="nav" aria-label="Sections">
       <a href="#now" data-i18n="nav.now">Now</a><a href="#trails" data-i18n="nav.trails">Trails</a><a href="#roads" data-i18n="nav.roads">Drives</a>
       <a href="#gear" data-i18n="nav.gear">Gear</a><a href="#stay" data-i18n="nav.stay">Stay</a><a href="#biz" data-i18n="nav.biz">For business</a>
@@ -52,13 +54,13 @@
       <button class="pill mode" type="button" data-mode-cycle title="Day and night"><svg class="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/></svg><svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><span id="mode-name">Auto</span></button>
       <button class="pill" type="button" data-season-cycle title="Season"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 20l6-9 4 5 3-4 5 8z"/><circle cx="17" cy="6" r="2.5"/></svg><span id="season-pill-name">Autumn</span></button>
       <div class="langs" role="group" aria-label="Language"><button type="button" data-lang="me">ME</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button></div>
+      <select class="lang-sel" data-lang-sel aria-label="Language"><option value="me">ME</option><option value="en">EN</option><option value="ru">RU</option></select>
     </div>
   </div>
 </header>
 
 <main id="top">
   <section class="hero wrap">
-    <span class="eyebrow" data-i18n="hero.eyebrow">National park · since 1983 · 280 bird species</span>
     <h1 data-i18n="hero.h1">Lake Skadar</h1>
     <p class="tagline" id="hero-tag">Golden reeds, the grape harvest in Crmnica and warm water into October.</p>
     <div class="ctas">
@@ -72,7 +74,7 @@
 
   <section class="band" id="now">
     <div class="wrap">
-      <div class="head"><div><div class="eyebrow" data-i18n="now.eyebrow">Now in the mountains</div><h2 data-i18n="now.title">Where it is best right now</h2>
+      <div class="head"><div><h2 data-i18n="now.title">Where it is best right now</h2>
         <div class="season-tabs" id="season-tabs" role="group" aria-label="Season"></div></div></div>
       <div class="now-grid">
         <div class="panel wx"><div id="wx"></div><div class="month-note" id="month-note"></div></div>
@@ -83,7 +85,7 @@
 
   <section class="band" id="trails">
     <div class="wrap">
-      <div class="head"><div><div class="eyebrow" data-i18n="trails.eyebrow">Hiking trails</div><h2 data-i18n="trails.title">Pick a trail</h2><p class="lede" data-i18n="trails.lede"></p></div>
+      <div class="head"><div><h2 data-i18n="trails.title">Pick a trail</h2><p class="lede" data-i18n="trails.lede"></p></div>
         <button class="btn ghost small map-toggle" type="button" data-map-toggle>Map</button></div>
       <div class="filters" id="filters" role="group" aria-label="Filter" style="margin-bottom:16px"></div>
       <div class="trails">
@@ -95,7 +97,7 @@
 
   <section class="band" id="roads">
     <div class="wrap">
-      <div class="head"><div><div class="eyebrow" data-i18n="roads.eyebrow">By car</div><h2 data-i18n="roads.title">Drives</h2><p class="lede" data-i18n="roads.lede"></p></div></div>
+      <div class="head"><div><h2 data-i18n="roads.title">Drives</h2><p class="lede" data-i18n="roads.lede"></p></div></div>
       <div class="drive-tabs" id="drive-tabs" role="group" aria-label="Drive"></div>
       <div class="drive panel" id="drive"></div>
     </div>
@@ -103,7 +105,7 @@
 
   <section class="band" id="gear">
     <div class="wrap">
-      <div class="head"><div><div class="eyebrow" data-i18n="gear.eyebrow">Gear</div><h2 data-i18n="gear.title">What to wear</h2></div></div>
+      <div class="head"><div><h2 data-i18n="gear.title">What to wear</h2></div></div>
       <div class="gear">
         <div class="panel box">
           <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" id="gear-season" role="group" aria-label="Season"></div><div class="seg" id="gear-level" role="group" aria-label="Level"></div></div>
@@ -121,7 +123,7 @@
 
   <section class="band" id="stay">
     <div class="wrap">
-      <div class="head"><div><div class="eyebrow" data-i18n="stay.eyebrow">Stay</div><h2 data-i18n="stay.title">Where to stay</h2><p class="lede" data-i18n="stay.lede"></p></div></div>
+      <div class="head"><div><h2 data-i18n="stay.title">Where to stay</h2><p class="lede" data-i18n="stay.lede"></p></div></div>
       <div class="areas" id="areas"></div>
       <div class="listings" id="listings"></div>
     </div>
@@ -131,7 +133,7 @@
     <div class="wrap">
       <div class="biz">
         <div class="panel bark box">
-          <div class="eyebrow" data-i18n="biz.eyebrow">For business</div>
+          
           <h2 data-i18n="biz.title">Your place on MonTop</h2>
           <p class="lede" style="margin:0" data-i18n="biz.lede"></p>
           <ul class="perks" id="perks"></ul>
@@ -159,7 +161,7 @@
 
   <section class="band" id="know">
     <div class="wrap">
-      <div class="head"><div><div class="eyebrow" data-i18n="know.eyebrow">Good to know</div><h2 data-i18n="know.title">Short and useful</h2></div></div>
+      <div class="head"><div><h2 data-i18n="know.eyebrow">Good to know</h2></div></div>
       <div class="know" id="know-grid"></div>
       <p class="src" style="margin-top:10px">nparkovi.me · parksdinarides.org</p>
     </div>
@@ -187,9 +189,9 @@
 </div>
 
 <script src="../assets/vendor/leaflet/leaflet.js"></script>
-<script src="data.js?v=202611101108"></script>
-<script src="park.js?v=202611101108"></script>
-<script src="../assets/i18n.js?v=202611101108"></script>
-<script src="../assets/app.js?v=202611101108"></script>
+<script src="data.js?v=202611130705"></script>
+<script src="park.js?v=202611130705"></script>
+<script src="../assets/i18n.js?v=202611130705"></script>
+<script src="../assets/app.js?v=202611130705"></script>
 </body>
 </html>

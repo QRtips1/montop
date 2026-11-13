@@ -20,6 +20,8 @@
 
   /* ---------- language ---------- */
   function detectLang() {
+    var q = (location.search.match(/[?&]lang=(me|en|ru)\b/) || [])[1];
+    if (q) { store.set("mt-lang", q); return q; }
     var saved = store.get("mt-lang");
     if (saved && I[saved]) return saved;
     var langs = navigator.languages || [navigator.language || "en"];
@@ -96,7 +98,7 @@
       var c = j.current || {};
       document.documentElement.setAttribute("data-fog", wKind(c.weather_code) === "fog" ? "1" : "0");
       document.documentElement.setAttribute("data-cloud", (c.cloud_cover > 80 || [3, 45, 48].indexOf(c.weather_code) > -1) ? "1" : "0");
-      renderWeather(); particles.retune();
+      renderWeather(); particles.retune(); declutter();
     }).catch(function () { weather = false; renderWeather(); });
   }
   function renderWeather() {
@@ -215,9 +217,12 @@
   function parallax() {
     var layers = $$("[data-speed]"), ticking = false;
     window.addEventListener("resize", declutter);
+    var pc = $("#particles");
     function apply() {
       ticking = false;
       var y = Math.min(window.scrollY || 0, window.innerHeight * 3);
+      // weather particles belong to the hero; keep only a trace over the content
+      if (pc) pc.style.opacity = Math.max(0.15, 1 - y / (window.innerHeight * 0.8)).toFixed(2);
       for (var i = 0; i < layers.length; i++) {
         var k = +layers[i].getAttribute("data-speed");
         layers[i].style.transform = "translate3d(-50%," + (-y * k).toFixed(1) + "px,0)";
@@ -298,6 +303,7 @@
     document.title = t("meta.title");
     $$("[data-i18n]").forEach(function (el) { el.textContent = t(el.getAttribute("data-i18n")); });
     $$(".langs button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === lang ? "true" : "false"); });
+    var ls = $("[data-lang-sel]"); if (ls) ls.value = lang;
     var mb = $("#mode-name"); if (mb) mb.textContent = t("mode." + mode);
     var mt = $("[data-mode-cycle]"); if (mt) mt.title = t("mode.title");
   }
@@ -374,7 +380,7 @@
       L_.polyline(h.line, { color: "#0b1d15", weight: 7, opacity: 0.7 }).addTo(ovLayer);
       var pl = L_.polyline(h.line, { color: DCOL[h.diff], weight: 4 }).addTo(ovLayer);
       var mk = L_.marker(h.start, { icon: L_.divIcon({ className: "", html: '<div class="start-marker"></div>', iconSize: [14, 14] }) }).addTo(ovLayer);
-      var pop = "<b>" + esc(L(h.name)) + "</b><br>" + fmtNum(h.km) + " " + t("u.km") + " · " + hoursTxt(h.hours) + '<br><a href="#t-' + h.id + '">' + esc(t("r.map")) + " →</a>";
+      var pop = "<b>" + esc(L(h.name)) + "</b><br>" + fmtNum(h.km) + " " + t("u.km") + " · " + hoursTxt(h.hours) + '<br><a href="#t-' + h.id + '">' + esc(t("r.map")) + "</a>";
       pl.bindPopup(pop); mk.bindPopup(pop);
       b = b.concat(h.line);
     });
@@ -472,7 +478,7 @@
     var btns = d.gmaps ? '<a class="btn primary" target="_blank" rel="noopener" href="' + gmapsDir(d.gmaps) + '">' + icon("nav") + esc(t("roads.open")) + "</a>" :
       '<div class="variants">' + (d.variants || []).map(function (v) { return '<a class="btn ghost" target="_blank" rel="noopener" href="' + gmapsDir(v) + '">' + icon("nav") + esc(L(v.n)) + "</a>"; }).join("") + "</div>";
     $("#drive").innerHTML = '<div class="info"><div style="display:grid;gap:8px"><h3>' + esc(L(d.name)) + '</h3><p class="lede" style="margin:0;font-size:16px">' + esc(L(d.tag)) + "</p>" +
-      (stat.length ? '<div class="stats">' + stat.join("") + "</div>" : "") + (d.id !== "arrive" ? '<div><h4 class="eyebrow" style="margin:6px 0">' + esc(t("roads.season")) + "</h4>" + monthsHtml(d.season) + "</div>" : "") + "</div>" + btns +
+      (stat.length ? '<div class="stats">' + stat.join("") + "</div>" : "") + (d.id !== "arrive" ? '<div><h4 style="margin:6px 0">' + esc(t("roads.season")) + "</h4>" + monthsHtml(d.season) + "</div>" : "") + "</div>" + btns +
       (d.stops.length ? '<ol class="stops">' + d.stops.map(function (s) { return "<li><span><b>" + esc(L(s.n)) + "</b><small>" + esc(L(s.d)) + '</small></span><a target="_blank" rel="noopener" href="' + gmapsPt(s.p) + '">' + esc(t("roads.pt")) + "</a></li>"; }).join("") + "</ol>" : "") +
       '<ul class="notes">' + d.notes.map(function (n) { return "<li>" + esc(L(n)) + "</li>"; }).join("") + "</ul>" +
       (d.src ? '<p class="src">' + esc(t("roads.src")) + ' <a href="' + d.src.u + '" target="_blank" rel="noopener">' + esc(d.src.t) + "</a></p>" : "") + "</div>" +
@@ -523,7 +529,7 @@
     $("#perks").innerHTML = [["card", "biz.p1"], ["pin", "biz.p2"], ["leaf", "biz.p3"]].map(function (p) { return "<li>" + icon(p[0]) + "<span>" + esc(t(p[1])) + "</span></li>"; }).join("");
   }
   function renderKnow() {
-    $("#know-grid").innerHTML = S.know.map(function (k) { return '<div class="panel"><b>' + esc(k.b) + "</b><span>" + esc(L(k.s)) + "</span></div>"; }).join("");
+    $("#know-grid").innerHTML = S.know.map(function (k) { return '<div class="panel"><b>' + esc(money(k.b)) + "</b><span>" + esc(L(k.s)) + "</span></div>"; }).join("");
   }
   function renderCredits() {
     var ps = D.photos || {}, seen = {}, items = [];
@@ -553,11 +559,15 @@
   }
 
   /* ---------- events ---------- */
+  function setLang(l) { lang = l; store.set("mt-lang", lang); renderAll(); if (!$("#sheet").hidden) route(); }
+  // EN writes the euro sign first (€5), ME and RU after the number (5 €)
+  function money(v) { var m = lang === "en" && /^(\d+(?:[.,]\d+)?)\s?€$/.exec(String(v)); return m ? "€" + m[1] : v; }
   function bind() {
+    var lsel = $("[data-lang-sel]"); if (lsel) lsel.addEventListener("change", function () { setLang(lsel.value); });
     document.addEventListener("click", function (e) {
       var el = e.target.closest("[data-mode-cycle],[data-lang],[data-season],[data-f],[data-d],[data-gs],[data-gl],[data-close],[data-print],[data-copy],[data-map-toggle],[data-season-cycle],.pick[data-drive]");
       if (!el) return;
-      if (el.hasAttribute("data-lang")) { lang = el.getAttribute("data-lang"); store.set("mt-lang", lang); renderAll(); if (!$("#sheet").hidden) route(); }
+      if (el.hasAttribute("data-lang")) { setLang(el.getAttribute("data-lang")); }
       else if (el.hasAttribute("data-season") && el.tagName === "BUTTON") { setSeason(el.getAttribute("data-season")); }
       else if (el.hasAttribute("data-mode-cycle")) { mode = MODES[(MODES.indexOf(mode) + 1) % 3]; store.set("mt-mode", mode); setPhase(); }
       else if (el.hasAttribute("data-season-cycle")) { var o = S.order; setSeason(o[(o.indexOf(season) + 1) % 4]); }
