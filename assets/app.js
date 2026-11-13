@@ -322,7 +322,8 @@
     labels.forEach(function (el) {
       var r = el.getBoundingClientRect();
       if (!r.width) return;
-      var bad = obs.some(function (q) { return hit(r, q, 8); }) || kept.some(function (q) { return hit(r, q, 4); });
+      var vw = document.documentElement.clientWidth;
+      var bad = r.left < 4 || r.right > vw - 4 || obs.some(function (q) { return hit(r, q, 8); }) || kept.some(function (q) { return hit(r, q, 4); });
       el.style.visibility = bad ? "hidden" : "";
       if (!bad) kept.push(r);
     });
