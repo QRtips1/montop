@@ -436,6 +436,9 @@
     hat: '<path d="M3 16c3 2 15 2 18 0"/><path d="M6 16c0-5 2-9 6-9s6 4 6 9"/>',
     bino: '<circle cx="7" cy="15" r="4"/><circle cx="17" cy="15" r="4"/><path d="M5 11l2-6h3l1 6M19 11l-2-6h-3l-1 6M11 13h2"/>',
     bug: '<ellipse cx="12" cy="14" rx="4" ry="6"/><path d="M12 8V5M8 11L4 9M16 11l4-2M8 15H3M16 15h5M8 19l-3 2M16 19l3 2"/>',
+    fork: '<path d="M7 3v7M5 3v4a2 2 0 004 0V3M7 10v11"/><path d="M17 21V3c-2 1-3 4-3 8h3"/>',
+    van: '<path d="M2 16V7a1 1 0 011-1h11l4 4h2a2 2 0 012 2v4h-2"/><path d="M2 16h3M10 16h6"/><circle cx="7.5" cy="16.5" r="2"/><circle cx="18" cy="16.5" r="2"/><path d="M6 9h6"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.6v.4"/>',
     swim: '<path d="M2 18c2 1.5 4 1.5 6 0s4-1.5 6 0 4 1.5 6 0M2 14c2 1.5 4 1.5 6 0s4-1.5 6 0 4 1.5 6 0"/><circle cx="15" cy="6" r="2"/><path d="M6 12l4-5 4 3"/>'
   };
   function icon(n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON[n] || ICON.leaf) + "</svg>"; }
@@ -712,6 +715,27 @@
       return '<div class="listing panel"><span class="example">' + esc(t("stay.example")) + '</span><div class="ph">' + icon(l.icon) + '</div><div class="tx"><b>' + esc(L(l.n)) + "</b><small>" + esc(L(l.s)) + "</small></div></div>";
     }).join("") + '<a class="listing panel cta" href="#biz"><b>' + esc(t("stay.ctaT")) + '</b><span class="btn primary small">' + esc(t("stay.ctaB")) + "</span></a>";
   }
+  /* ---------- nearby places (assets/places.js) ---------- */
+  var nearCat = "eat";
+  var NEAR_ICON = { eat: "fork", tour: "nav", info: "info", gear: "boot", camper: "van" };
+  var DAYS = { me: ["Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"], en: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], ru: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] };
+  function hrs(h) { return h.replace(/\b(Mo|Tu|We|Th|Fr|Sa|Su)\b/g, function (m) { return (DAYS[lang] || DAYS.en)[["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].indexOf(m)]; }); }
+  function renderNear() {
+    var box = $("#near-list"), all = (window.MT_PLACES || {})[PARK] || [];
+    if (!box) return;
+    if (!all.length) { $("#near").hidden = true; return; }
+    var cats = ["eat", "tour", "info", "gear", "camper", "all"].filter(function (c) { return c === "all" || all.some(function (p) { return p.c === c; }); });
+    if (cats.indexOf(nearCat) < 0) nearCat = cats[0];
+    $("#near-tabs").innerHTML = cats.map(function (c) { return '<button type="button" data-near="' + c + '" aria-pressed="' + (c === nearCat) + '">' + esc(t("near." + c)) + "</button>"; }).join("");
+    box.innerHTML = all.filter(function (p) { return nearCat === "all" || p.c === nearCat; }).map(function (p) {
+      var name = typeof p.n === "string" ? p.n : L(p.n), links = "";
+      if (p.ll) links += '<a class="btn ghost small" href="https://www.google.com/maps/search/?api=1&query=' + p.ll[0] + "," + p.ll[1] + '" target="_blank" rel="noopener">' + icon("pin") + esc(t("near.map")) + "</a>";
+      if (p.url) links += '<a class="btn ghost small" href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(t("near.site")) + "</a>";
+      if (p.tel) links += '<a class="btn ghost small" href="tel:' + esc(p.tel.replace(/[^+0-9]/g, "")) + '">' + esc(t("near.call")) + "</a>";
+      return '<div class="place panel"><div class="pi">' + icon(NEAR_ICON[p.c]) + '</div><div class="pt"><small>' + esc(t("near." + p.c)) + " · " + esc(L(p.w)) + "</small><b>" + esc(name) + "</b><span>" + esc(L(p.d)) + "</span>" +
+        (p.h ? '<span class="hrs">' + esc(hrs(p.h)) + "</span>" : "") + (links ? '<div class="pl">' + links + "</div>" : "") + "</div></div>";
+    }).join("");
+  }
   function renderBiz() {
     $("#cats").innerHTML = t("cats").map(function (c) { return "<span>" + esc(c) + "</span>"; }).join("");
     var sel = $("#f-type"), v = sel.value;
@@ -768,7 +792,7 @@
   function bind() {
     var lsel = $("[data-lang-sel]"); if (lsel) lsel.addEventListener("change", function () { setLang(lsel.value); });
     document.addEventListener("click", function (e) {
-      var el = e.target.closest("[data-mode-cycle],[data-lang],[data-season],[data-f],[data-d],[data-gs],[data-gl],[data-close],[data-print],[data-copy],[data-map-toggle],[data-season-cycle],.pick[data-drive]");
+      var el = e.target.closest("[data-mode-cycle],[data-lang],[data-season],[data-f],[data-d],[data-gs],[data-gl],[data-close],[data-print],[data-copy],[data-map-toggle],[data-season-cycle],[data-near],.pick[data-drive]");
       if (!el) return;
       if (el.hasAttribute("data-lang")) { setLang(el.getAttribute("data-lang")); }
       else if (el.hasAttribute("data-season") && el.tagName === "BUTTON") { setSeason(el.getAttribute("data-season")); }
@@ -778,6 +802,7 @@
       else if (el.hasAttribute("data-d")) { curDrive = el.getAttribute("data-d"); renderDrives(); }
       else if (el.hasAttribute("data-gs")) { setSeason(el.getAttribute("data-gs")); }
       else if (el.hasAttribute("data-gl")) { gearLvl = el.getAttribute("data-gl"); renderGear(); }
+      else if (el.hasAttribute("data-near")) { nearCat = el.getAttribute("data-near"); renderNear(); }
       else if (el.hasAttribute("data-close")) { closeSheet(); }
       else if (el.hasAttribute("data-print")) { window.print(); }
       else if (el.hasAttribute("data-copy")) { copyText(el.getAttribute("data-copy"), el); }
@@ -800,7 +825,7 @@
   }
 
   function renderAll() {
-    applyStatic(); setSeason(season); renderNature(); renderFilters(); renderTrails(); renderDrives(); renderStay(); renderBiz(); renderKnow(); renderCredits(); renderWeather();
+    applyStatic(); setSeason(season); renderNature(); renderFilters(); renderTrails(); renderDrives(); renderStay(); renderNear(); renderBiz(); renderKnow(); renderCredits(); renderWeather();
     var mt = $("[data-map-toggle]"); if (mt) mt.textContent = t($("#mapbox").classList.contains("collapsed") ? "map.show" : "map.hide");
     declutter();
   }

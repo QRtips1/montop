@@ -35,7 +35,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Onest:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
-<link rel="stylesheet" href="../assets/montop.css?v=202611171945">
+<link rel="stylesheet" href="../assets/montop.css?v=202611172030">
 <style>html[data-park="lovcen"] { --sky-1: #8fb0c8; --sky-2: #d7cdb6; --sky-3: #f0d3a2; --far-1: #cfcdc6; --far-2: #8c9294; --mid-1: #8f8f86; --mid-2: #5b5f58; --near-1: #7d7a55; --near-2: #3e4330; --water-1: #3f7f95; --water-2: #1f4a5c; --shine: #f7e6c2; --road: #f4efe4; --town: #d49a74; --ff: #1d2a1c; --fb: #2a3a26; } html[data-park="lovcen"][data-season="winter"] { --sky-1: #a9c2d6; --sky-2: #dfe7ee; --sky-3: #f3f1ea; --far-1: #f6f8f9; --far-2: #a9b2b8; --mid-1: #a3a7a3; --mid-2: #6b716c; --near-1: #6f7656; --near-2: #394331; --water-1: #4b7d90; --water-2: #25495a; --shine: #ffffff; --town: #c9a189; } html[data-park="lovcen"][data-season="spring"] { --sky-1: #72aad6; --sky-2: #c4dcea; --sky-3: #ecefdc; --far-1: #dfe2de; --far-2: #8f9997; --mid-1: #8c9686; --mid-2: #566352; --near-1: #7f9a5c; --near-2: #3d5734; --water-1: #3a86a3; --water-2: #1d5468; --shine: #fff7df; } html[data-park="lovcen"][data-season="summer"] { --sky-1: #3f88c8; --sky-2: #95c6e4; --sky-3: #dcf0f2; --far-1: #dadad3; --far-2: #8e938b; --mid-1: #8e9180; --mid-2: #585e4b; --near-1: #6f8150; --near-2: #384428; --water-1: #2f8fb0; --water-2: #155a74; --shine: #ffffff; } </style>
 </head>
 <body>
@@ -63,7 +63,7 @@
     <a class="brand" href="/me/" aria-label="MonTop" translate="no"><img class="logo" src="../assets/brand/logo-head.png" width="69" height="44" alt="MonTop"><span class="reg">Lovćen</span></a>
     <nav class="nav" aria-label="Sections">
       <a href="#now" data-i18n="nav.now">Now</a><a href="#trails" data-i18n="nav.trails">Trails</a><a href="#roads" data-i18n="nav.roads">Drives</a>
-      <a href="#gear" data-i18n="nav.gear">Gear</a><a href="#stay" data-i18n="nav.stay">Stay</a><a href="#biz" data-i18n="nav.biz">For business</a>
+      <a href="#gear" data-i18n="nav.gear">Gear</a><a href="#stay" data-i18n="nav.stay">Stay</a><a href="#near" data-i18n="nav.near">Nearby</a><a href="#biz" data-i18n="nav.biz">For business</a>
     </nav>
     <div class="tools">
       <button class="pill mode" type="button" data-mode-cycle title="Day and night"><svg class="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/></svg><svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><span id="mode-name">Auto</span></button>
@@ -83,8 +83,6 @@
       <a class="btn ghost" href="#roads" data-i18n="hero.drive">Where to drive</a>
     </div>
     <div class="nowstrip" id="nowstrip" aria-live="polite"></div>
-    <p class="indep"><span data-i18n="hero.indep">Independent guide, not the park's official website.</span> <a href="https://nparkovi.me" target="_blank" rel="noopener" data-i18n="hero.official">Official site: nparkovi.me</a></p>
-    <a class="scroll-cue" href="#now" data-i18n="hero.cue">Down the serpentine</a>
   </section>
 
   <section class="band" id="now">
@@ -148,6 +146,15 @@
     </div>
   </section>
 
+  <section class="band" id="near">
+    <div class="wrap">
+      <div class="head"><div><h2 data-i18n="near.title">Nearby</h2><p class="lede" data-i18n="near.lede"></p></div></div>
+      <div class="seg near-tabs" id="near-tabs" role="group" aria-label="Nearby"></div>
+      <div class="near-list" id="near-list"></div>
+      <p class="src near-src"><span data-i18n="near.src"></span> <a href="#biz" data-i18n="near.add">Add your place</a></p>
+    </div>
+  </section>
+
   <section class="band" id="biz">
     <div class="wrap">
       <div class="biz">
@@ -198,7 +205,7 @@
       <p data-i18n="foot.photos" style="margin-bottom:0"></p>
       <ul id="credits"></ul>
     </details>
-    <p class="disclaimer" data-i18n="foot.disc"></p>
+    <p class="disclaimer"><span data-i18n="foot.disc"></span> <a href="https://nparkovi.me" target="_blank" rel="noopener" data-i18n="hero.official">Official site: nparkovi.me</a></p>
   </div>
 </footer>
 
@@ -208,10 +215,11 @@
 </div>
 
 <script src="../assets/vendor/leaflet/leaflet.js"></script>
-<script src="data.js?v=202611171945"></script>
-<script src="park.js?v=202611171945"></script>
-<script src="../assets/nature.js?v=202611171945"></script>
-<script src="../assets/i18n.js?v=202611171945"></script>
-<script src="../assets/app.js?v=202611171945"></script>
+<script src="data.js?v=202611172030"></script>
+<script src="park.js?v=202611172030"></script>
+<script src="../assets/nature.js?v=202611172030"></script>
+<script src="../assets/places.js?v=202611172030"></script>
+<script src="../assets/i18n.js?v=202611172030"></script>
+<script src="../assets/app.js?v=202611172030"></script>
 </body>
 </html>

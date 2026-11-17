@@ -566,3 +566,21 @@ html[data-ink="light"] .peak-label, html[data-phase="dusk"] .peak-label, html[da
 .nfact .ntag { align-self: flex-start; font: 600 12px/1 var(--f-data); color: var(--emerald); background: rgba(255, 255, 255, .05); border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px; }
 .nfact .nsrc { margin-top: auto; padding-top: 6px; font-size: 13px; color: var(--mist-3); }
 .nfact .nsrc a { color: var(--mist-2); text-decoration: underline; text-underline-offset: 2px; }
+
+/* nearby places */
+.near-tabs { margin-top: 4px; border-radius: 22px; }
+.near-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.place { display: grid; grid-template-columns: 40px 1fr; gap: 12px; padding: 14px 16px; align-items: start; }
+.place .pi { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(226, 173, 98, .14); color: var(--resin, #e2ad62); }
+.place .pi svg { width: 22px; height: 22px; }
+.place .pt { display: grid; gap: 3px; min-width: 0; }
+.place .pt small { color: var(--mist-3); font-size: 13px; }
+.place .pt b { font: 600 20px/1.15 var(--f-display); }
+.place .pt span { color: var(--mist-2); font-size: 15px; }
+.place .pt .hrs { font-size: 13px; color: var(--mist-3); font-variant-numeric: tabular-nums; }
+.place .pl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.place .pl .btn { min-height: 36px; padding: 6px 12px; font-size: 14px; gap: 6px; }
+.place .pl .btn svg { width: 15px; height: 15px; }
+.near-src { margin-top: 14px; }
+@media (max-width: 980px) { .near-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .near-list { grid-template-columns: 1fr; } .place .pl .btn { min-height: 44px; } }
