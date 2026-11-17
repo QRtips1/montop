@@ -20,7 +20,7 @@
 
   /* ---------- language ---------- */
   function detectLang() {
-    var q = (location.search.match(/[?&]lang=(me|en|ru)\b/) || [])[1];
+    var q = (location.search.match(/[?&]lang=(me|en|ru)\b/) || [])[1] || document.documentElement.getAttribute("data-lang-page");
     if (q) { store.set("mt-lang", q); return q; }
     var saved = store.get("mt-lang");
     if (saved && I[saved]) return saved;
@@ -692,7 +692,19 @@
   }
 
   /* ---------- events ---------- */
-  function setLang(l) { lang = l; store.set("mt-lang", lang); renderAll(); if (!$("#sheet").hidden) route(); }
+  function setLang(l) {
+    store.set("mt-lang", l);
+    /* each language has its own URL (for search engines): go there instead of switching in place */
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + ({ me: "sr-ME", en: "en", ru: "ru" })[l] + '"]');
+    if (alt && l !== lang && !/[?&]lang=/.test(location.search)) { location.href = alt.href + location.hash; return; }
+    lang = l; renderAll(); if (!$("#sheet").hidden) route();
+  }
+  /* language pages borrow the English page's files via <base>; keep #links on the language URL */
+  if (document.querySelector("base")) window.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault(); var h = a.getAttribute("href"); if (h.length > 1) location.hash = h;
+  });
   // EN writes the euro sign first (€5), ME and RU after the number (5 €)
   function money(v) { var m = lang === "en" && /^(\d+(?:[.,]\d+)?)\s?€$/.exec(String(v)); return m ? "€" + m[1] : v; }
   function bind() {
