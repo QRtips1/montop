@@ -151,7 +151,8 @@
     root.setAttribute("data-mode", mode);
     var mb = $("#mode-name"); if (mb) mb.textContent = t("mode." + mode);
     particles.retune();
-    lightning(storm && mode !== "night");
+    lightning(storm && mode !== "night" && !terraOn);
+    terraPush();
   }
   // screen positions that depend on the far layer: the sun glow and the moon
   function placeSky() {
@@ -182,6 +183,60 @@
     }, 2500 + Math.random() * 5000);
   }
 
+  /* ---------- 3D background: real relief and satellite colour (assets/terra.js, three.js), only where WebGL2 works ---------- */
+  var terra = null, terraOn = false;
+  var ASSETS = ((document.currentScript && document.currentScript.src) || "").replace(/app\.js(\?.*)?$/, "");
+  var AVER = (((document.currentScript && document.currentScript.src) || "").split("?")[1] || "");
+  function terraWeather() {
+    var c = wxNow();
+    if (c) return c;
+    // another season picked: show its typical look
+    return ({ winter: { weather_code: 71, cloud_cover: 80, snowfall: .15, wind_speed_10m: 6 }, spring: { weather_code: 2, cloud_cover: 40, wind_speed_10m: 10 },
+      summer: { weather_code: 1, cloud_cover: 15, wind_speed_10m: 8 }, autumn: { weather_code: 2, cloud_cover: 35, wind_speed_10m: 10, relative_humidity_2m: 92 } })[season] || {};
+  }
+  function terraState() {
+    var d = new Date(), sp = bodyPos(sunCoords(toDays(d)), d), mp = bodyPos(moonCoords(toDays(d)), d), mi = moonIllum(d);
+    var s = { sunAlt: sp.alt, sunAz: sp.az, moonAlt: mp.alt, moonAz: mp.az, moonFrac: mi.frac, moonWaxing: mi.waxing };
+    var head = VIEW.fd || 180;
+    if (mode === "day" && s.sunAlt < 20) { s.sunAlt = 32; s.sunAz = (head + 290) % 360; }
+    if (mode === "night" && s.sunAlt > -12) {
+      s.sunAlt = -22; s.sunAz = (head + 180) % 360;
+      if (s.moonAlt < 12) { s.moonAlt = 24; s.moonAz = (head + 25) % 360; }
+      s.moonFrac = Math.max(s.moonFrac, .6);
+    }
+    s.weather = terraWeather(); s.month = PM; s.season = season; s.live = !!wxNow(); s.wxElev = weather && weather.elevation; s.reduced = reduced;
+    return s;
+  }
+  function terraPush() {
+    if (!terra) return;
+    var r = terra.update(terraState());
+    // text colour follows the real brightness of the 3D sky (a bright overcast sky keeps dark text)
+    if (r && r.sky != null) document.documentElement.setAttribute("data-ink", r.sky < .42 ? "light" : "");
+  }
+  function heroRects() {
+    return [].map.call(document.querySelectorAll(".hero > *"), function (el) { var rg = document.createRange(); rg.selectNodeContents(el); return rg.getBoundingClientRect(); })
+      .filter(function (r) { return r.width && r.bottom > 0; });
+  }
+  function terraInit() {
+    var sc = $(".scene"), nc = navigator.connection;
+    // keep the drawn scene on data saver, very weak devices and ?flat
+    if (!sc || !PARK || !ASSETS || (nc && nc.saveData) || /[?&]flat\b/.test(location.search) || navigator.deviceMemory < 2 || navigator.hardwareConcurrency < 3) return;
+    try { if (!document.createElement("canvas").getContext("webgl2")) return; } catch (e) { return; }
+    var mobile = Math.min(screen.width, screen.height) < 700 || /Mobi|Android/i.test(navigator.userAgent);
+    var js = document.createElement("script"); js.src = ASSETS + "terra.js" + (AVER ? "?" + AVER : ""); js.async = true;
+    js.onload = function () {
+      if (!window.MTTerra) return;
+      window.MTTerra.mount(sc, { base: ASSETS + "terra/" + PARK + "/", mobile: mobile, before: $("#particles"), obstacles: heroRects, maxFps: +((location.search.match(/[?&]t3fps=(\d+)/) || [])[1] || 0) }).then(function (t) {
+        terra = t; terraPush();
+        requestAnimationFrame(function () {
+          sc.classList.add("terra-on"); terraOn = true; lightning(false); particles.retune();
+          setTimeout(function () { sc.classList.add("terra-done"); }, 1500);
+        });
+      }).catch(function (e) { if (window.console) console.warn("3D background off:", e); });
+    };
+    document.head.appendChild(js);
+  }
+
   /* ---------- weather ---------- */
   var WMO = {
     0: ["Vedro", "Clear", "Ясно"], 1: ["Pretežno vedro", "Mostly clear", "Малооблачно"], 2: ["Djelimično oblačno", "Partly cloudy", "Переменная облачность"], 3: ["Oblačno", "Overcast", "Пасмурно"],
@@ -205,7 +260,8 @@
   function fmtTime(iso) { return iso ? iso.slice(11, 16) : "–"; }
   function fetchWeather() {
     var url = "https://api.open-meteo.com/v1/forecast?latitude=" + ZAB.lat + "&longitude=" + ZAB.lon +
-      "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,snow_depth,cloud_cover,is_day" +
+      "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,snow_depth,cloud_cover,is_day," +
+      "precipitation,rain,showers,snowfall,wind_direction_10m,wind_gusts_10m,cloud_cover_low,visibility,relative_humidity_2m,freezing_level_height" +
       "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FPodgorica&forecast_days=3";
     fetch(url).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (j) {
       weather = j;
@@ -253,6 +309,7 @@
         if (season === "summer" && ph === "night") m.push("flies");
       }
       if (P.birds && ph !== "night" && kind !== "rain" && kind !== "snow") m.push("birds");
+      if (terraOn) m = m.filter(function (x) { return x !== "snow" && x !== "rain" && x !== "stars"; });
       return m.filter(Boolean);
     }
     function spawn(kind) {
@@ -432,6 +489,7 @@
     $("#hero-tag").textContent = L(S.tagline[s]);
     $("#season-pill-name").textContent = t("season." + s);
     renderSeasonTabs(); renderPicks(); renderGear(); particles.retune();
+    terraPush();
   }
   function renderSeasonTabs() {
     $("#season-tabs").innerHTML = S.order.map(function (s) {
@@ -752,4 +810,5 @@
   window.addEventListener("resize", placeSky);
   if (window.innerWidth <= 900) $("#mapbox").classList.add("collapsed");
   renderAll(); bind(); parallax(); initForm(); fetchWeather(); route();
+  terraInit();
 })();

@@ -101,6 +101,21 @@ html[data-fog="1"] .fog { --fog-op: .85; }
 @keyframes drift { from { translate: -8% 0; } to { translate: 8% 0; } }
 #particles { position: absolute; inset: 0; width: 100%; height: 100%; }
 .scene-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 17, 12, 0) 55%, rgba(6, 17, 12, .55) 100%); }
+/* 3D background (assets/terra.js): fades in over the drawn scene, which then stops drawing */
+.t3-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.2s ease; }
+.scene.terra-on .t3-canvas, .t3-canvas.on { opacity: 1; }
+.scene.terra-done > .sky, .scene.terra-done > .sky-night, .scene.terra-done > .sky-dusk, .scene.terra-done > .sun, .scene.terra-done > .clouds,
+.scene.terra-done > .layer, .scene.terra-done > .fog, .scene.terra-done > .tint, .scene.terra-done > .moon, .scene.terra-done > .flash, .scene.terra-done > .bolt { display: none; }
+.t3-labels { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; }
+.scene.terra-on .t3-labels, .t3-labels.on { opacity: 1; }
+.t3-peak { position: absolute; left: 0; top: 0; transition: opacity .4s; will-change: transform; }
+.t3-l { position: absolute; left: 0; bottom: 0; transform: translateX(-50%); padding-bottom: 14px; text-align: center; white-space: nowrap;
+  font: 500 12px/1.15 var(--f-data); letter-spacing: .03em; color: rgba(14, 24, 18, .86); text-shadow: 0 0 6px rgba(255, 255, 255, .7), 0 0 2px rgba(255, 255, 255, .6); }
+.t3-l b { display: block; font-weight: 600; font-size: 13px; }
+.t3-l::after { content: ""; position: absolute; left: 50%; bottom: 2px; height: 10px; border-left: 1px solid currentColor; }
+html[data-phase="night"] .t3-l, html[data-phase="dusk"] .t3-l, html[data-phase="dawn"] .t3-l, html[data-ink="light"] .t3-l {
+  color: rgba(255, 255, 255, .92); text-shadow: 0 1px 2px rgba(0, 0, 0, .55), 0 0 10px rgba(0, 0, 0, .35); }
+.t3-peak.minor .t3-l { opacity: .85; }
 
 /* ---------- Top bar ---------- */
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: rgba(8, 20, 14, .9); }
