@@ -107,7 +107,10 @@ html[data-fog="1"] .fog { --fog-op: .85; }
 .scene.terra-done > .sky, .scene.terra-done > .sky-night, .scene.terra-done > .sky-dusk, .scene.terra-done > .sun, .scene.terra-done > .clouds,
 .scene.terra-done > .layer, .scene.terra-done > .fog, .scene.terra-done > .tint, .scene.terra-done > .moon, .scene.terra-done > .flash, .scene.terra-done > .bolt { display: none; }
 .t3-labels { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; }
-.scene.terra-on .t3-labels, .t3-labels.on { opacity: 1; }
+.scene.terra-on .t3-labels, .t3-labels.on { opacity: max(0, 1 - var(--veil, 0) * 2.5); }
+/* below the hero the 3D view sinks behind a dark veil, so text on the sections stays readable in any weather */
+.scene-veil { position: absolute; inset: 0; background: var(--pine-950); opacity: 0; }
+.scene.terra-on .scene-veil { opacity: calc(var(--veil, 0) * .9); }
 .t3-peak { position: absolute; left: 0; top: 0; transition: opacity .4s; will-change: transform; }
 .t3-l { position: absolute; left: 0; bottom: 0; transform: translateX(-50%); padding-bottom: 14px; text-align: center; white-space: nowrap;
   font: 500 12px/1.15 var(--f-data); letter-spacing: .03em; color: rgba(14, 24, 18, .86); text-shadow: 0 0 6px rgba(255, 255, 255, .7), 0 0 2px rgba(255, 255, 255, .6); }

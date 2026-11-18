@@ -386,6 +386,14 @@
     });
   }
 
+  /* ---------- veil over the 3D view below the hero (also with reduced motion) ---------- */
+  function veil() {
+    var vt = false, st = document.documentElement.style;
+    function set() { vt = false; var h = window.innerHeight || 800; st.setProperty("--veil", Math.min(1, Math.max(0, ((window.scrollY || 0) - h * .12) / (h * .45))).toFixed(3)); }
+    function req() { if (!vt) { vt = true; requestAnimationFrame(set); } }
+    window.addEventListener("scroll", req, { passive: true }); window.addEventListener("resize", req); set();
+  }
+
   /* ---------- parallax ---------- */
   function parallax() {
     var layers = $$("[data-speed]"), ticking = false;
@@ -834,6 +842,6 @@
   setPhase(); setInterval(setPhase, 60 * 1000);
   window.addEventListener("resize", placeSky);
   if (window.innerWidth <= 900) $("#mapbox").classList.add("collapsed");
-  renderAll(); bind(); parallax(); initForm(); fetchWeather(); route();
+  renderAll(); bind(); parallax(); veil(); initForm(); fetchWeather(); route();
   terraInit();
 })();
