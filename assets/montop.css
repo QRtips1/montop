@@ -587,3 +587,47 @@ html[data-ink="light"] .peak-label, html[data-phase="dusk"] .peak-label, html[da
 .near-src { margin-top: 14px; }
 @media (max-width: 980px) { .near-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .near-list { grid-template-columns: 1fr; } .place .pl .btn { min-height: 44px; } }
+
+/* ---------- painted background (assets/paint/<park>/, app.js paintInit): the picture, and the live sky drawn over its sky only ---------- */
+.pbox { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.pbox > * { position: absolute; left: 0; right: 0; bottom: 0; top: 0; pointer-events: none; }
+.pbox > .p-ext { bottom: auto; height: 0; opacity: 0; transition: opacity .8s ease; }
+.p-img { width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .8s ease; }
+.p-img.cur, .scene.paint-on .p-ext { opacity: 1; }
+.p-tint { background: var(--tint, #fff); mix-blend-mode: multiply; transition: background-color 2s linear; }
+.pbox.nt .p-tint { background: var(--tint-wx, #fff); }
+.p-haze { background: linear-gradient(180deg, rgb(196, 203, 210), rgba(176, 184, 192, .7)); opacity: calc(var(--w-over, 0) * .3 + var(--w-storm, 0) * .15); transition: opacity 2s linear; }
+.p-sky { -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: 0 100%, 0 0; mask-position: 0 100%, 0 0; overflow: hidden; }
+.p-sky > .sky-x { inset: 0; }
+.pbox.nt .p-sky .sky-dawn, .pbox.nt .p-sky .sky-dusk, .pbox.nt .p-sky .sky-blue, .pbox.nt .p-sky .sky-night { display: none; }
+.pbox.nt .p-sky .sky-over { background: linear-gradient(180deg, #7d8894 0%, #a3abb3 60%, #b9bdbf 100%); }
+html[data-phase="night"] .p-sky .sky-over { background: linear-gradient(180deg, #161c28, #262e3c); }
+.p-sky .sun { width: 60vmax; height: 60vmax; }
+.p-sky .clouds { top: 0; height: 60%; }
+.p-sky .clouds.c2 { top: 8%; height: 50%; }
+.p-stars { position: absolute; inset: 0; opacity: var(--stars, 0); transition: opacity 2s linear;
+  background-image:
+    radial-gradient(1.6px 1.6px at 13px 21px, #fff 35%, rgba(255, 255, 255, 0) 100%), radial-gradient(1.3px 1.3px at 61px 77px, #f4f6ff 35%, rgba(255, 255, 255, 0) 100%),
+    radial-gradient(2.2px 2.2px at 97px 43px, #fff 35%, rgba(255, 255, 255, 0) 100%), radial-gradient(1.3px 1.3px at 141px 119px, #eef2ff 35%, rgba(255, 255, 255, 0) 100%),
+    radial-gradient(1.8px 1.8px at 29px 151px, #fff 35%, rgba(255, 255, 255, 0) 100%), radial-gradient(1.2px 1.2px at 173px 9px, #fff 35%, rgba(255, 255, 255, 0) 100%),
+    radial-gradient(1.4px 1.4px at 47px 101px, #fff 35%, rgba(255, 255, 255, 0) 100%), radial-gradient(2px 2px at 211px 167px, #fffbe9 35%, rgba(255, 255, 255, 0) 100%);
+  background-size: 190px 190px, 230px 230px, 170px 170px, 260px 260px, 210px 210px, 150px 150px, 120px 120px, 300px 300px; }
+.p-fog { top: 52%; bottom: auto; height: 22%; left: -50%; right: auto; opacity: 0; transition: opacity 3s linear; }
+.p-fog.f2 { top: 64%; height: 26%; }
+html[data-wet="1"] .p-fog { opacity: .35; }
+html[data-fog="1"] .p-fog { opacity: .85; }
+/* a soft light (by day) or dark (night, dusk, storm) pool behind the hero text, fading out on scroll */
+.p-scrim { position: absolute; inset: 0; pointer-events: none; opacity: max(0, 1 - var(--veil, 0) * 2); transition: background 2s linear;
+  background: radial-gradient(46% 42% at 22% 31%, rgba(238, 243, 246, .5), rgba(238, 243, 246, .22) 50%, rgba(238, 243, 246, 0) 75%); }
+html[data-ink="light"] .p-scrim, html[data-phase="night"] .p-scrim, html[data-phase="dusk"] .p-scrim, html[data-phase="dawn"] .p-scrim {
+  background: radial-gradient(46% 42% at 22% 31%, rgba(5, 10, 20, .42), rgba(5, 10, 20, .18) 50%, rgba(5, 10, 20, 0) 75%); }
+@media (max-width: 760px) { .p-scrim { display: none; } }
+.p-labels { opacity: max(0, 1 - var(--veil, 0) * 2.5); }
+.p-labels .peak-label { padding-bottom: 14px; font: 500 12px/1.15 var(--f-data); letter-spacing: .03em; color: rgba(14, 24, 18, .86);
+  text-shadow: 0 0 6px rgba(255, 255, 255, .75), 0 0 2px rgba(255, 255, 255, .6); }
+.p-labels .peak-label b { font-size: 13px; }
+.p-labels .peak-label.lt, html[data-phase="night"] .p-labels .peak-label, html[data-phase="dusk"] .p-labels .peak-label, html[data-phase="dawn"] .p-labels .peak-label, html[data-ink="light"] .p-labels .peak-label {
+  color: rgba(255, 255, 255, .92); text-shadow: 0 1px 2px rgba(0, 0, 0, .55), 0 0 10px rgba(0, 0, 0, .35); }
+@media (max-width: 640px) { .p-labels .peak-label.minor { display: block; } }
+.scene.paint-done > .sky, .scene.paint-done > .sky-x, .scene.paint-done > .layer, .scene.paint-done > .tint { display: none; }
+.scene.paint-on .scene-veil { opacity: calc(var(--veil, 0) * .9); }

@@ -117,6 +117,9 @@
     mul([150, 158, 166], over * .3);
     mul([92, 100, 112], storm * .32);
     st.setProperty("--tint", "rgb(" + tint.map(function (v) { return Math.round(v * 255); }).join(",") + ")");
+    var tw = [1 - over * .3 * (1 - 150 / 255), 1 - over * .3 * (1 - 158 / 255), 1 - over * .3 * (1 - 166 / 255)].map(function (v, i) { return v * (1 - storm * .32 * (1 - [92, 100, 112][i] / 255)); });
+    st.setProperty("--tint-wx", "rgb(" + tw.map(function (v) { return Math.round(v * 255); }).join(",") + ")");
+    root.setAttribute("data-wet", wet ? "1" : "0");
     // the sun: a disc on the far ridge layer, so it really sets behind the mountains; its glow follows it
     var sunVis = mode === "auto" && sp.alt > -1.5 && sp.az > VIEW.az0 && sp.az < VIEW.az1 && cc < 88 && !wet;
     var orb = $(".sun-orb");
@@ -136,13 +139,7 @@
     var moonVis = moonUp && mode === "auto" && ridge != null && mp.alt > ridge + .4 && cc < 85 && !wet;
     if (mode === "night") { moonVis = true; }
     root.setAttribute("data-moon", moonVis ? "1" : "0");
-    if (moonVis) {
-      var r = 1, k = Math.cos(Math.PI * mi.frac), lit = $(".moon .m-lit");  // terminator ellipse
-      var f = mi.frac, sweepOuter = mi.waxing ? 1 : 0, rx = Math.abs(1 - 2 * f), sweepIn = (f > .5) === mi.waxing ? 1 : 0;
-      if (lit) lit.setAttribute("d", "M0,-1 A1,1 0 0," + sweepOuter + " 0,1 A" + rx.toFixed(3) + ",1 0 0," + (sweepIn ? 1 : 0) + " 0,-1 Z");
-      st.setProperty("--moon-op", (a > 0 ? .45 : .95).toFixed(2));
-      mx = mode === "night" ? null : mp;
-    }
+    if (moonVis || PAINT) { moonDraw(mi, a); mx = moonVis && mode !== "night" ? mp : null; }
     light = { sun: a, sunAz: sp.az, moon: mx, wNight: wNight, cloud: cc, storm: storm };
     placeSky();
     var ph = a < -6 ? "night" : a < 4 ? (evening ? "dusk" : "dawn") : "day";
@@ -152,7 +149,12 @@
     var mb = $("#mode-name"); if (mb) mb.textContent = t("mode." + mode);
     particles.retune();
     lightning(storm && mode !== "night" && !terraOn);
-    terraPush();
+    terraPush(); paintPush();
+  }
+  function moonDraw(mi, a) {  // the lit part: outer half circle plus the terminator ellipse
+    var lit = $(".moon .m-lit"), f = mi.frac, sweepOuter = mi.waxing ? 1 : 0, rx = Math.abs(1 - 2 * f), sweepIn = (f > .5) === mi.waxing ? 1 : 0;
+    if (lit) lit.setAttribute("d", "M0,-1 A1,1 0 0," + sweepOuter + " 0,1 A" + rx.toFixed(3) + ",1 0 0," + (sweepIn ? 1 : 0) + " 0,-1 Z");
+    document.documentElement.style.setProperty("--moon-op", (a > 0 ? .45 : .95).toFixed(2));
   }
   // screen positions that depend on the far layer: the sun glow and the moon
   function placeSky() {
@@ -237,6 +239,122 @@
     document.head.appendChild(js);
   }
 
+  /* ---------- painted background (assets/paint/<park>/): one picture per season and time of day; the live weather,
+     sun glow, moon and stars are drawn over its sky only (a mask cut along the real ridge), so they set behind the peaks ---------- */
+  var PAINT = (function () { try { return JSON.parse($(".scene").getAttribute("data-paint") || "null"); } catch (e) { return null; } })();
+  var paintOn = false, pbox = null, pcur = "", pnat = false, pdim = null;
+  var PSEAS = ["winter", "spring1", "spring2", "summer", "autumn1", "autumn2"];
+  var PMONTH = ["winter", "winter", "winter", "spring1", "spring1", "spring2", "summer", "summer", "summer", "autumn1", "autumn2", "winter"];
+  function paintWant() {
+    var s = season === curSeason ? PMONTH[PM] : ({ winter: "winter", spring: "spring2", summer: "summer", autumn: "autumn1" })[season] || PMONTH[PM];
+    var a = light.sun, tm = a < -4 ? "night" : a < 7 ? "sunset" : "day";
+    // the nearest season that has a picture; its own time of day if there is one, else its day picture darkened by the tint
+    var v = PAINT.v, i0 = PSEAS.indexOf(s);
+    for (var d = 0; d < 4; d++) {
+      var c = [PSEAS[(i0 + d) % 6], PSEAS[(i0 + 6 - d) % 6]];
+      for (var j = 0; j < 2; j++) {
+        if (v[c[j] + "-" + tm]) return { id: c[j] + "-" + tm, nat: true };
+        var alt = ["day", "sunset", "night"].filter(function (x) { return v[c[j] + "-" + x]; })[0];
+        if (alt) return { id: c[j] + "-" + alt, nat: alt === tm };
+      }
+    }
+    var any = Object.keys(v)[0];
+    return { id: any, nat: any.split("-")[1] === tm };
+  }
+  function paintUrl(id, w) { return ASSETS + "paint/" + PARK + "/" + id + "-" + w + ".jpg?" + PAINT.v[id].h; }
+  function paintLayout() {
+    if (!pbox) return;
+    var sc = $(".scene"), W = sc.clientWidth, H = sc.clientHeight, ar = PAINT.ar;
+    // tall screens: the picture keeps at least `fill` of the height and the sky continues above it
+    var h = Math.max(W / ar, H * (PAINT.fill || .62)), w = h * ar;
+    var top = h < H ? H - h : -Math.min(h - H, Math.max(0, h * PAINT.peakY / 100 - Math.max(110, H * .14)));
+    var left = (W - w) * PAINT.fx, ext = Math.max(0, Math.ceil(top));
+    pdim = { w: w, h: h, ext: ext };
+    var bs = pbox.style; bs.left = left.toFixed(1) + "px"; bs.top = top.toFixed(1) + "px"; bs.width = w.toFixed(1) + "px"; bs.height = h.toFixed(1) + "px";
+    $$(".p-ext, .p-tint, .p-haze, .p-sky", pbox).forEach(function (el) { el.style.top = -ext + "px"; });
+    $(".p-ext", pbox).style.height = (ext + 2) + "px";
+    var sky = $(".p-sky", pbox), ms = "100% " + Math.round(h) + "px, 100% " + (ext + 2) + "px";
+    sky.style.webkitMaskSize = sky.style.maskSize = ms;
+    paintSkyBodies();
+  }
+  function paintSkyBodies() {
+    if (!pdim) return;
+    var d = new Date(), mp = bodyPos(moonCoords(toDays(d)), d), a = PAINT.az, ext = pdim.ext;
+    function at(az, alt) { return [(az - a[0]) / (a[1] - a[0]) * pdim.w, ext + (PAINT.hor - alt * PAINT.dpa) / 100 * pdim.h]; }
+    var sun = $(".p-sky .sun"), moon = $(".p-sky .moon");
+    var sp = at(Math.max(a[0] - 20, Math.min(a[1] + 20, light.sunAz || 200)), Math.max(-3, light.sun));
+    sun.style.left = sp[0].toFixed(0) + "px"; sun.style.top = sp[1].toFixed(0) + "px";
+    // the moon: its real direction and phase while it is inside the picture; on the night button, a fixed place in the sky
+    var m = at(mp.az, mp.alt), inView = mp.alt > 0 && mp.az > a[0] && mp.az < a[1] && m[1] > ext + pdim.h * .03;
+    var cc = light.cloud, wet = document.documentElement.getAttribute("data-wet") === "1";
+    var vis = mode === "night" || (mode === "auto" && inView && cc < 85 && !wet);
+    if (mode === "night" && !inView) m = [pdim.w * .33, ext + pdim.h * .07];
+    moon.style.left = m[0].toFixed(0) + "px"; moon.style.top = m[1].toFixed(0) + "px";
+    document.documentElement.setAttribute("data-moon", vis ? "1" : "0");
+  }
+  function paintPush() {
+    if (!pbox) return;
+    var want = paintWant(), st = document.documentElement.style, root = document.documentElement;
+    if (want.id !== pcur) paintShow(want.id);
+    pnat = want.nat; pbox.classList.toggle("nt", pnat);
+    var o = parseFloat(st.getPropertyValue("--w-over")) || 0, sto = parseFloat(st.getPropertyValue("--w-storm")) || 0;
+    // the day picture at night or at sunset: darker and cooler, the tint does the colour
+    var fn = pnat ? 0 : light.wNight, fd = pnat ? 0 : clamp01(1 - Math.abs(light.sun - 1) / 7) * (1 - light.wNight);
+    var img = $(".p-img.cur", pbox);
+    if (img) img.style.filter = "saturate(" + (1 - o * .4 - sto * .2 - fn * .45 - fd * .12).toFixed(3) + ") brightness(" + (1 - o * .1 - sto * .15 - fn * .3).toFixed(3) + ")";
+    var cc = light.cloud, wet = root.getAttribute("data-wet") === "1";
+    st.setProperty("--stars", (light.wNight * clamp01(1 - (cc - 35) / 45) * (wet ? 0 : 1) * (pnat ? .6 : 1)).toFixed(3));
+    var ph = root.getAttribute("data-phase");
+    root.setAttribute("data-ink", ph !== "day" || sto > .3 || o > .7 ? "light" : "");
+    paintSkyBodies();
+  }
+  function paintShow(id) {
+    pcur = id;
+    var v = PAINT.v[id], need = (pdim ? pdim.w : window.innerWidth) * Math.min(2, window.devicePixelRatio || 1), w = v.w[v.w.length - 1];
+    for (var i = 0; i < v.w.length; i++) if (v.w[i] >= need * .9) { w = v.w[i]; break; }
+    var img = new Image(), sky = $(".p-sky", pbox), ext = $(".p-ext", pbox);
+    img.className = "p-img"; img.alt = ""; img.decoding = "async";
+    img.onload = function () {
+      if (pcur !== id) return;
+      var old = $$(".p-img.cur", pbox);
+      pbox.insertBefore(img, $(".p-tint", pbox));
+      var mk = "url('" + ASSETS + "paint/" + PARK + "/" + id + "-sky.png?" + v.h + "'), linear-gradient(#000, #000)";
+      sky.style.webkitMaskImage = sky.style.maskImage = mk;
+      ext.style.background = "linear-gradient(180deg, rgba(10, 30, 70, .14), rgba(10, 30, 70, 0)), linear-gradient(90deg, " + v.top.join(", ") + ")";
+      requestAnimationFrame(function () {
+        img.classList.add("cur"); paintPush();
+        old.forEach(function (o) { o.classList.remove("cur"); setTimeout(function () { o.remove(); }, 1200); });
+        if (!paintOn) {
+          var sc = $(".scene"); sc.classList.add("paint-on"); paintOn = true; particles.retune(); declutter();
+          setTimeout(function () { sc.classList.add("paint-done"); }, 1000);
+        }
+      });
+    };
+    img.src = paintUrl(id, w);
+  }
+  function paintInit() {
+    var sc = $(".scene");
+    if (!PAINT || !PAINT.v || !Object.keys(PAINT.v).length || !sc || !ASSETS || /[?&]t3\b/.test(location.search)) return false;
+    pbox = document.createElement("div"); pbox.className = "pbox";
+    var lab = (PAINT.labels || []).map(function (l) {
+      return '<span class="peak-label p-l' + (l.minor ? " minor" : "") + (l.lt ? " lt" : "") + '" style="left:' + l.x + "%;top:" + l.y + '%"><b>' + esc(l.n) + "</b>" + l.e + " m</span>";
+    }).join("");
+    pbox.innerHTML = '<div class="p-ext"></div><div class="p-tint"></div><div class="p-haze"></div>' +
+      '<div class="p-sky"><div class="sky-x sky-over"></div><div class="sky-x sky-dawn"></div><div class="sky-x sky-dusk"></div><div class="sky-x sky-blue"></div><div class="sky-x sky-night"></div><div class="sky-x sky-storm"></div><div class="p-stars"></div></div>' +
+      '<div class="fog p-fog"></div><div class="fog p-fog f2"></div><div class="p-labels">' + lab + "</div>";
+    var sky = $(".p-sky", pbox);
+    // sun glow, moon and clouds move into the picture's sky
+    sky.insertBefore($(".sun", sc), $(".p-stars", sky));
+    sky.appendChild($(".moon", sc));
+    $$(".clouds", sc).forEach(function (c) { sky.appendChild(c); });
+    sc.insertBefore(pbox, $(".tint", sc));
+    var scrim = document.createElement("div"); scrim.className = "p-scrim"; sc.insertBefore(scrim, $(".tint", sc));
+    paintLayout();
+    window.addEventListener("resize", paintLayout);
+    paintPush();
+    return true;
+  }
+
   /* ---------- weather ---------- */
   var WMO = {
     0: ["Vedro", "Clear", "Ясно"], 1: ["Pretežno vedro", "Mostly clear", "Малооблачно"], 2: ["Djelimično oblačno", "Partly cloudy", "Переменная облачность"], 3: ["Oblačno", "Overcast", "Пасмурно"],
@@ -310,6 +428,7 @@
       }
       if (P.birds && ph !== "night" && kind !== "rain" && kind !== "snow") m.push("birds");
       if (terraOn) m = m.filter(function (x) { return x !== "snow" && x !== "rain" && x !== "stars"; });
+      if (paintOn) m = m.filter(function (x) { return x !== "stars"; });
       return m.filter(Boolean);
     }
     function spawn(kind) {
@@ -500,7 +619,7 @@
     $("#hero-tag").textContent = L(S.tagline[s]);
     $("#season-pill-name").textContent = t("season." + s);
     renderSeasonTabs(); renderPicks(); renderGear(); particles.retune();
-    terraPush();
+    terraPush(); paintPush();
   }
   function renderSeasonTabs() {
     $("#season-tabs").innerHTML = S.order.map(function (s) {
@@ -843,5 +962,5 @@
   window.addEventListener("resize", placeSky);
   if (window.innerWidth <= 900) $("#mapbox").classList.add("collapsed");
   renderAll(); bind(); parallax(); veil(); initForm(); fetchWeather(); route();
-  terraInit();
+  if (!paintInit()) terraInit();
 })();
